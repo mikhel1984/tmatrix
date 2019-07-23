@@ -2,7 +2,7 @@
  * @file tmatrix.h
  * @author Stanislav Mikhel
  * @date 2019
- * @brief Main structures and functions for manipulation with matrices.
+ * @brief Definitions of the main structures and functions for matrices.
  * 
  * This library is written in pure C and focused on coordinate transformations
  * in robotics applications. The header contains main data types and functions 

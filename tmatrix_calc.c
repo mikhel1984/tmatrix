@@ -1,4 +1,9 @@
-
+/**
+ * @file tmatrix_calc.c
+ * @author Stanislav Mikhel
+ * @date 2019
+ * @brief Arithmetic operations and transformations.
+ */ 
 #include <stdlib.h>
 #include <math.h>
 #include "tmatrix.h"

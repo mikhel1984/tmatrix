@@ -1,4 +1,9 @@
-
+/**
+ * @file tmatrix_homo.c
+ * @author Stanislav Mikhel
+ * @date 2019
+ * @brief Homogenous transformations and specific simplifications.
+ */ 
 #include <stdlib.h>
 #include <math.h>
 #include "tmatrix_homo.h"

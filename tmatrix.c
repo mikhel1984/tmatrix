@@ -1,3 +1,9 @@
+/**
+ * @file tmatrix.c
+ * @author Stanislav Mikhel
+ * @date 2019
+ * @brief Main structures and functions for manipulation with matrices.
+ */ 
 #include <stdio.h>
 #include <stdlib.h>
 #include "tmatrix.h"

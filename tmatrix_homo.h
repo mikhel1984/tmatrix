@@ -2,9 +2,10 @@
  * @file tmatrix_homo.h
  * @author Stanislav Mikhel
  * @date 2019
- * @brief Specialized methods for homogenous transformations.
+ * @brief Definition of methods for homogenous transformations.
  *
  * Homogenous transformations assumes manipulations with matrices 4x4. 
+ * Provides all basic matrix operations.
  */
 #ifndef T_MATRIX_HOMO_H
 #define T_MATRIX_HOMO_H
