@@ -126,21 +126,17 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
         /* check destination */
         R3 = dst->rows; C3 = dst->cols; 
         if(R3 != R1 || C3 != C2) { 
-          /* if the size is equal, any type is acceptible, otherwise the size will be changed */
-          if(IS_PRIM(dst)) {
+          /* if the size is equal, any type is acceptible, otherwise only dynamic */
+          if(dst->type == TM_MAIN) {
             N = R1 * C2;
-            if(R3 * C3 < N) {
-              /* if the memory is static, it cannot be expanded... */
-              if(dst->type == TM_MAIN) {
-                /* get new memory */
-                data = (tmVal*) malloc(N*sizeof(tmVal));
-                if(data) {
-                  free(dst->data);
-                  dst->data = data;  
-                } else 
-                  e = TM_ERR_NO_MEMORY;                
+            if(R3 * C3 < N) {              
+              /* get new memory */
+              data = (tmVal*) malloc(N*sizeof(tmVal));
+              if(data) {
+                free(dst->data);
+                dst->data = data;  
               } else 
-                e = TM_ERR_NOT_MAIN;                     
+                e = TM_ERR_NO_MEMORY;                                 
             }               
           } else 
             e = TM_ERR_NOT_MAIN;

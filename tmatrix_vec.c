@@ -90,17 +90,14 @@ int vec_cross(tMat *res, tMat *a, tMat *b, int *err)
   if(res && a && b) {
     if(vec_len(a) == 3 && vec_len(b) == 3) {
       if(vec_len(res) != 3) {
-        if(IS_PRIM(res)) {
-          if(res->rows * res->cols < 3) {
-            if(res->type == TM_MAIN) {
-              data = (tmVal*) malloc(3*sizeof(tmVal));
-              if(data) {
-                free(res->data);
-                res->data = data;
-              } else 
-                e = TM_ERR_NO_MEMORY;
+        if(res->type == TM_MAIN) {
+          if(res->rows * res->cols < 3) {            
+            data = (tmVal*) malloc(3*sizeof(tmVal));
+            if(data) {
+              free(res->data);
+              res->data = data;
             } else 
-              e = TM_ERR_NOT_MAIN;
+              e = TM_ERR_NO_MEMORY;            
             if(!e) {
               res->rows = 3;
               res->cols = 1;
