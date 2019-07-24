@@ -38,7 +38,7 @@
 /** 
  * @brief Internal data types.
  */
-typedef unsigned char tmSize;  /**< Number of rows/columns (assumed < 264).  */
+typedef unsigned char tmSize;  /**< Number of rows/columns (assumed < 256).  */
 typedef double tmVal;          /**< Type of the matrix elements. */
 
 /** 
