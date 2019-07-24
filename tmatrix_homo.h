@@ -2,9 +2,9 @@
  * @file tmatrix_homo.h
  * @author Stanislav Mikhel
  * @date 2019
- * @brief Definition of methods for homogenous transformations.
+ * @brief Definition of methods for homogeneous transformations.
  *
- * Homogenous transformations assumes manipulations with matrices 4x4. 
+ * Homogeneous transformations assumes manipulations with matrices 4x4. 
  * Provides all basic matrix operations.
  */
 #ifndef T_MATRIX_HOMO_H
@@ -13,7 +13,7 @@
 #include "tmatrix.h"
 
 /**
- * @brief Homogenous matrix size. 
+ * @brief Homogeneous matrix size. 
  */
 #define TM_HOMO_SIZE 16
 /**
@@ -41,14 +41,14 @@
  */
 #define h_Tz(dst,z,err)  h_Txyz(dst,0,0,z,err)
 /**
- * @brief Create homogenous matrix with dynamic memory.
+ * @brief Create homogeneous matrix with dynamic memory.
  * @param err error code.
  * @return New matrix.
  * @note Free memory with @a tm_clear.
  */
 #define h_new(err)       tm_new(4,4,err)
 /**
- * @brief Create homogenous matrix with static memory.
+ * @brief Create homogeneous matrix with static memory.
  * @param err error code.
  * @return New matrix.
  */
@@ -66,7 +66,7 @@ int h_Txyz(tMat* dst, tmVal x, tmVal y, tmVal z, int *err);
 /**
  * @brief Get matrix for Z rotation.
  * @param dst destination matrix.
- * @param a angle (radians).
+ * @param a angle (rad).
  * @param err error code.
  * @return 1 in case of success.
  */
@@ -74,7 +74,7 @@ int h_Rz(tMat* dst, tmVal a, int *err);
 /**
  * @brief Get matrix for Y rotation.
  * @param dst destination matrix.
- * @param b angle (radians).
+ * @param b angle (rad).
  * @param err error code.
  * @return 1 in case of success.
  */
@@ -82,7 +82,7 @@ int h_Ry(tMat* dst, tmVal b, int *err);
 /**
  * @brief Get matrix for X rotation.
  * @param dst destination matrix.
- * @param v angle (radians).
+ * @param v angle (rad).
  * @param err error code.
  * @return 1 in case of success.
  */

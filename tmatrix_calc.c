@@ -126,7 +126,7 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
         /* check destination */
         R3 = dst->rows; C3 = dst->cols; 
         if(R3 != R1 || C3 != C2) { 
-          /* if the size is equal, any type is acceptible, otherwise only dynamic */
+          /* if the size is equal, any type is acceptable, otherwise only dynamic */
           if(dst->type == TM_MAIN) {
             N = R1 * C2;
             if(R3 * C3 < N) {              
@@ -399,7 +399,7 @@ tMat pinvl(tMat *A, tmVal tol, int *rr, int *err)
   
   for(k = 0; k < n; k++) {
     r++;
-    /* get culumn */
+    /* get column */
     blk = tm_block(A, k,k,n-k,1, &e); 		if(e) goto end_pinvl;
     B.rows = n-k; B.cols = 1;
     tm_insert(&B, &blk, &e); 			if(e) goto end_pinvl;
@@ -456,7 +456,7 @@ tMat tm_pinv(tMat *src, int *err)
   n = A.rows;
   L = pinvl(&A,tol,&r,&e); 		if(e) goto end_pinv;
   
-  /* auxilary matrices */
+  /* auxiliary matrices */
   blk = tm_block(&L, 0,0,n,r, &e); 	if(e) goto end_pinv;
   LL = tm_copy(&blk,&e); 		if(e) goto end_pinv;
   Lt = tm_T(&LL,&e); 			if(e) goto end_pinv;
@@ -465,7 +465,7 @@ tMat tm_pinv(tMat *src, int *err)
   tm_mul(&prod1, &Lt, &LL, &e); 	if(e) goto end_pinv;
   M = tm_inv(&prod1, &e); 		if(e) goto end_pinv;
     
-  /* find pseudoinverse */
+  /* find pseudo inverse*/
   prod2 = tm_new(1,1,&e); 		if(e) goto end_pinv;
   if(transp) {
     /* st*LL*M*M*Lt  */

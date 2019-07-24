@@ -45,7 +45,7 @@ typedef double tmVal;          /**< Type of the matrix elements. */
  * @brief Matrix object. 
  *
  * Matrix could contain allocated memory or include pointer to another object
- * with definition of access rules (for transposed matrix of submatrix).
+ * with definition of access rules (for transposed matrix of sub matrix).
  */
 typedef struct tMat_ {
    tmVal* data;                /**< Pointer to data array. */
@@ -69,7 +69,7 @@ tMat tm_new(tmSize r, tmSize c, int* err);
 /** 
  * @brief Create matrix from static array.
  *
- * Method pointer into a matrix structure without moditications.
+ * Method pointer into a matrix structure without modifications.
  * @param r number of rows.
  * @param c number of columns.
  * @param dat data array.
@@ -153,7 +153,7 @@ tMat tm_copy(tMat* src, int *err);
  */
 tMat tm_T(tMat* src, int *err);
 /** 
- * @brief Create submatrix.
+ * @brief Create sub matrix.
  * 
  * Method doesn't allocate new memory, is is just a reference to the original matrix.
  * @param src source matrix.
@@ -162,7 +162,7 @@ tMat tm_T(tMat* src, int *err);
  * @param Nr number of rows.
  * @param Nc number of columns.
  * @param err error code.
- * @return Submatrix.
+ * @return Sub matrix.
  */
 tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err);
 /** 

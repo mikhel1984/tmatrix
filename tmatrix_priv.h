@@ -13,7 +13,7 @@
 #define TM_STATIC    0   /**< Matrix contains pointer to static memory. */
 #define TM_MAIN      1   /**< Matrix contains pointer to dynamic memory. */
 #define TM_TRANSPOSE 2   /**< Matrix has link to another matrix data and define transposition access. */
-#define TM_SUB       3   /**< Matrix has link to another matrix data and define submatrix access. */
+#define TM_SUB       3   /**< Matrix has link to another matrix data and define sub matrix access. */
 /**
  * @brief Check if the matrix has direct access to the data.
  * @param X pointer to matrix.
@@ -33,7 +33,7 @@ enum TM_ERR {
      TM_ERR_NOT_COMPAT,       /**< Matrices are not compatible for current operation. */
      TM_ERR_NOT_DEF,          /**< Operation is not defined. */
      TM_ERR_NO_SOLUTN,        /**< Solution cannot be found. */
-     TM_ERR_NOT_HOMO,         /**< Not a homogenous transform matrix. */
+     TM_ERR_NOT_HOMO,         /**< Not a homogeneous transform matrix. */
      TM_ERR_NOT_VEC,          /**< Not a vector. */
      TM_ERR_TOTAL             /**< Number of errors in list. */   
 };

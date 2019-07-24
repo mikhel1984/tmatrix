@@ -1,6 +1,7 @@
-/*
+/*	example.h
+
   Consider an example of library application for creating forward
-  kinematics and Jacobian functions for "typical" manipulator structure 
+  kinematics and Jacobean functions for "typical" manipulator structure 
   Rz - Tz - Ry - Tz - Ry - Tz - Rx - Tz - Ry - Tz - Rx - Tz
 */
 #include <stdio.h>
@@ -12,9 +13,9 @@
 
 /* Forward kinematics for current joint state */
 tMat FK(tmVal q[], int *err);
-/* Jacobian for current joint state */
+/* Jacobean for current joint state */
 tMat Jac(tmVal q[], int *err);
-/* Simplify Jacobian evaluation */
+/* Simplify Jacobean evaluation */
 int copy_cols(tMat *dst, tMat *src, int c, int axe, int *err);
 /* Links */
 tmVal d[JOINT_NO] = {0.3,0.4,0.5,0.5,0.2,0.1};
@@ -34,13 +35,13 @@ int main()
   if(err) printf("ERROR: %s\n", tm_error(err));
   tm_print(&fk);
 
-  puts("Jacobian");
+  puts("Jacobean");
   jac = Jac(q, &err);
   if(err) printf("ERROR: %s\n", tm_error(err));
   tm_print(&jac);
   
   /* assume that joint velocity is also q 
-     and find Cartesian velicities */
+     and find Cartesian velocities */
   puts("Cartesian velocity");
   qvel = vec_static(JOINT_NO,q,&err);
   if(err) printf("ERROR: %s\n", tm_error(err));
@@ -123,16 +124,16 @@ tMat Jac(tmVal q[], int *err)
   /* intermediate states */
   tmp = h_static(a1,err); if(*err) return res; 
   acc = h_static(a2,err); if(*err) return res;
-  /* allocate memory for Jacobian (6x6) */
+  /* allocate memory for Jacobean (6x6) */
   res = tm_new(CART_NO,JOINT_NO,err);
   if(*err) return res;
   
-  /* prepare Jacobian columns */
+  /* prepare Jacobean columns */
   h_eye(&acc,err); if(*err) return res;
   /* joint 1 position and Z axis */
   if(!copy_cols(&res,&acc,0,2,err)) return res;
   success = 
-  /* initialize            transform             save to Jacobian */
+  /* initialize            transform             save to Jacobean */
   /* joint 2 position and Y axis */  
   h_Rz(&tmp,q[0],err) && h_mul(&acc,&tmp,err) &&
   h_Tz(&tmp,d[0],err) && h_mul(&acc,&tmp,err) && copy_cols(&res,&acc,1,1,err) && 
@@ -160,7 +161,7 @@ tMat Jac(tmVal q[], int *err)
   for(i = 0; i < JOINT_NO; i++) {    
     col  = tm_block(&res,0,i,3,1,err); if(*err) return res;
     axis = tm_block(&res,3,i,3,1,err); if(*err) return res;
-    /* axe x (ee - col) */
+    /* axis x (ee - col) */
     success = tm_insert(&tmp,&ee,err) && tm_sub(&tmp,&col,err) && vec_cross(&col,&axis,&tmp,err);
     if(!success) break;
   }

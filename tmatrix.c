@@ -9,7 +9,7 @@
 #include "tmatrix.h"
 #include "tmatrix_priv.h"
 
-/* "Private" method for access to matrix elements without additional checkings. */
+/* "Private" method for access to matrix elements without additional checking. */
 tmVal* tm_at(tMat* m, tmSize r, tmSize c) {
   return (m->type == TM_TRANSPOSE) ? (m->data + (c * m->width + r)) 
                                    : (m->data + (r * m->width + c));
@@ -303,12 +303,12 @@ const char* tm_error(int code)
     "wrong size definition",
     "cannot allocate memory",
     "obligatory arguments are missed",
-    "matrix with statically or dinamically allocated memory is expected",
+    "matrix with statically or dynamically allocated memory is expected",
     "source and destination have different size",
     "matrices are not compatible for current operation",
     "operation is not defined",
     "solution cannot be found",
-    "homogenous matrix is expected",
+    "homogeneous matrix is expected",
     "vector is expected"
   };
   
