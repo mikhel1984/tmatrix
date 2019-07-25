@@ -12,7 +12,7 @@
 #define TINY         1E-20
 #define PINV_TOL_MAX 1E100
 #define PINV_TOL     1E-9
-#define PINV_TMP_VEC 8
+#define MEM_TMP_VEC 8
 
 int tm_add(tMat *dst, tMat* m, int* err) 
 {
@@ -175,11 +175,11 @@ void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
 {
   int i, imax, j, k, n;
   tmVal big, dum, sum, tmp, *irow, *vv = NULL;
-  tmVal arr[PINV_TMP_VEC] = {0};
+  tmVal arr[MEM_TMP_VEC] = {0};
    
   n = dst->rows;
   /* allocate memory */
-  vv = (n <= PINV_TMP_VEC) ? arr : (tmVal*) malloc(n * sizeof(tmVal));
+  vv = (n <= MEM_TMP_VEC) ? arr : (tmVal*) malloc(n * sizeof(tmVal));
   if(!vv) {
     if(err) *err = TM_ERR_NO_MEMORY;
     goto end_ludcmp;
@@ -242,7 +242,7 @@ void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
   }  
 
 end_ludcmp:  
-  if(n > PINV_TMP_VEC) free(vv);  
+  if(n > MEM_TMP_VEC) free(vv);  
 }
 
 void lubksb(tMat *src, int indx[], tMat *b)
@@ -304,7 +304,7 @@ tmVal tm_det(tMat *m, int *err)
 tMat tm_inv(tMat *m, int *err)
 {
   int e = 0, n = 0, *idx = NULL, j;
-  int arr[PINV_TMP_VEC] = {0};
+  int arr[MEM_TMP_VEC] = {0};
   tmVal d;
   tMat tmp = NULL_TMATRIX, res = NULL_TMATRIX, 
        col;
@@ -315,7 +315,7 @@ tMat tm_inv(tMat *m, int *err)
       tmp = tm_copy(m,&e);
       if(!e) res = tm_eye(n,n,&e);         
       if(!e) {        
-        idx = (n <= PINV_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));        
+        idx = (n <= MEM_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));        
         if(idx) {
           ludcmp(&tmp,idx,&d,&e);
           if(!e) {
@@ -333,7 +333,7 @@ tMat tm_inv(tMat *m, int *err)
   } else 
     e = TM_ERR_EMPTY_ARGS;
   
-  if(n > PINV_TMP_VEC) free(idx);
+  if(n > MEM_TMP_VEC) free(idx);
   tm_clear(&tmp);
    
   if(err) *err = e;
@@ -489,3 +489,59 @@ end_pinv:
   return prod1;
 }
 
+int tm_rank(tMat* m, int* err)
+{
+  int e = 0, res = 0, i,j, R = 0,C, q;
+  tMat cp = NULL_TMATRIX, tmp; 
+  tmVal k, *swp, **ptr = NULL, *arr[MEM_TMP_VEC];
+
+  if(m) {
+    /* make copy for modification */
+    if(m->rows > m->cols) {
+      tmp = tm_T(m,&e); 
+      if(!e) cp = tm_copy(&tmp,&e);
+    } else 
+      cp = tm_copy(m,&e);
+    if(!e) {
+      /* use pointers to rows instead of copying elements */
+      R = cp.rows; C = cp.cols;
+      ptr = (R <= MEM_TMP_VEC) ? arr : (tmVal**) malloc(sizeof(tmVal*) * R);
+      if(!ptr) {
+        if(err) *err = TM_ERR_NO_MEMORY;
+	return 0;
+      }
+      /* initialize rows pointers */
+      ptr[0] = cp.data;
+      for(i = 1; i < R; i++) ptr[i] = ptr[i-1] + C;
+      /* triangulate */
+      for(i = 0; i < R; i++) {
+	/* looking for nonzero elements */
+	for(j = i+1; j < R && ptr[i][i] == 0; j++) {
+	  if(ptr[j][i] != 0) {
+	    swp = ptr[j]; ptr[j] = ptr[i]; ptr[i] = swp;
+	  }
+	}
+	k = ptr[i][i];
+	if(k != 0) {
+	  /* normalize to k */
+	  for(j = i; j < C; j++) ptr[i][j] /= k;
+	  /* subtract */
+	  for(q = i+1; q < R; q++) {
+	    k = ptr[q][i];
+	    for(j = i; j < C; j++) ptr[q][j] -= k * ptr[i][j];
+	  }
+	  res++;  /* increase rank counter */
+	} else 
+	  break;
+      }
+    }
+  } else 
+    e = TM_ERR_EMPTY_ARGS;
+
+  if(err) *err = e;
+  
+  tm_clear(&cp);
+  if(R > MEM_TMP_VEC) free(ptr);
+
+  return res;
+}

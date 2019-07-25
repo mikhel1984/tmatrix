@@ -259,5 +259,12 @@ tMat tm_pinv(tMat *m, int *err);
  * @return Description string.
  */
 const char* tm_error(int code);
+/**
+ * @brief Find rank of the matrix.
+ * @param m matrix object.
+ * @param err error code.
+ * @return Rank value.
+ */
+int tm_rank(tMat *m, int *err);
 
 #endif /* T_MATRIX_H */

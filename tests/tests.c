@@ -25,6 +25,7 @@ static char* test_inv();
 static char* test_pinv();
 static char* test_homo();
 static char* test_vec();
+static char* test_rank();
 
 /* ~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -59,6 +60,7 @@ static char* all_tests()
   mu_run(test_pinv);
   mu_run(test_homo);
   mu_run(test_vec);
+  mu_run(test_rank);
   
   return 0;
 }
@@ -452,5 +454,28 @@ static char* test_vec()
     
   tm_clear(&pr);
   
+  return 0;
+}
+
+static char* test_rank()
+{
+  int err = 0, rnk;
+  tmVal a1[6] = {1,2,3,1,2,3}, a2[9] = {1,2,3,0,0,6,7,8,9};
+  tMat m1;
+
+  m1 = tm_static(2,3,a1,&err);
+  mu_check("Rank (static):",err);
+
+  rnk = tm_rank(&m1,&err);
+  mu_check("Rank (rank):", err);
+  mu_assert("Rank (rank): wrong result", rnk == 1);
+
+  m1 = tm_static(3,3,a2,&err);
+  mu_check("Rank (static):",err);
+
+  rnk = tm_rank(&m1,&err);
+  mu_check("Rank (rank):", err);
+  mu_assert("Rank (rank): wrong result", rnk == 3);
+
   return 0;
 }
