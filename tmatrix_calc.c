@@ -16,8 +16,7 @@
 
 int tm_add(tMat *dst, tMat* m, int* err) 
 {
-  int i,j,R,C;
-  int e = 0;
+  int i,j,R,C, e = 0;
   tmVal *p1, *p2;
    
   if(dst && m) {         
@@ -49,8 +48,7 @@ int tm_add(tMat *dst, tMat* m, int* err)
 
 int tm_sub(tMat *dst, tMat* m, int* err) 
 {
-  int i,j,R,C;
-  int e = 0;
+  int i,j,R,C, e = 0;
   tmVal *p1,*p2;
    
   if(dst && m) {
@@ -83,8 +81,7 @@ int tm_sub(tMat *dst, tMat* m, int* err)
 
 int tm_scale(tMat *dst, tmVal k, int* err)
 {
-  int R,C,i,j;
-  int e = 0;
+  int R,C,i,j, e = 0;
   tmVal *p;
    
   if(dst) {
@@ -112,26 +109,25 @@ int tm_scale(tMat *dst, tmVal k, int* err)
 
 int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
 {
-  tmSize R1,C1,R2,C2,R3,C3;
-  int N,i,j,k;
+  tmSize R1,C1,C2,R3,C3;
+  int i,j,k, e = 0;
   tmVal* data, acc;
-  int e = 0;
    
   if(dst && a && b) {
     if(dst != a && dst != b) {
       /* check matrices for product */
       R1 = a->rows; C1 = a->cols;
-      R2 = b->rows; C2 = b->cols;
-      if(C1 == R2) {
+      C2 = b->cols;
+      if(C1 == b->rows) {
         /* check destination */
         R3 = dst->rows; C3 = dst->cols; 
         if(R3 != R1 || C3 != C2) { 
           /* if the size is equal, any type is acceptable, otherwise only dynamic */
           if(dst->type == TM_MAIN) {
-            N = R1 * C2;
-            if(R3 * C3 < N) {              
+            k = R1 * C2;
+            if(R3 * C3 < k) {              
               /* get new memory */
-              data = (tmVal*) malloc(N*sizeof(tmVal));
+              data = (tmVal*) malloc(k*sizeof(tmVal));
               if(data) {
                 free(dst->data);
                 dst->data = data;  
@@ -174,7 +170,7 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
 void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
 {
   int i, imax, j, k, n;
-  tmVal big, dum, sum, tmp, *irow, *vv = NULL;
+  tmVal big, dum, sum, *irow, *vv = NULL;
   tmVal arr[MEM_TMP_VEC] = {0};
    
   n = dst->rows;
@@ -191,8 +187,8 @@ void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
     big = 0.0;
     irow = dst->data + i * n;
     for(j = 0; j < n; j++) {
-      tmp = fabs(irow[j]);
-      if(tmp > big) big = tmp;
+      dum = fabs(irow[j]);
+      if(dum > big) big = dum;
     }
     if(big == 0.0) {
       if(err) *err = TM_ERR_NO_SOLUTN;
@@ -343,7 +339,7 @@ tMat tm_inv(tMat *m, int *err)
 
 tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
 {
-  int e = 0, m, n, n1, n2, i;
+  int e = 0, m, n, i;
   tmVal tol = PINV_TOL_MAX, v;
   tMat A = NULL_TMATRIX, st;
    
@@ -363,8 +359,8 @@ tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
       tm_mul(&A,&st,src,&e); 	if(e) goto end_pinva;
     }
     /* tolerance */
-    n2 = n*n; n1 = n+1;
-    for(i = 0; i < n2; i += n1) {
+    m = n+1; n *= n; 
+    for(i = 0; i < n; i += m) {
       v = A.data[i];
       if(v <= 0) 
         v = PINV_TOL_MAX;
@@ -449,9 +445,8 @@ tMat tm_pinv(tMat *src, int *err)
   tmVal tol = 0;
   tMat A = NULL_TMATRIX, L = NULL_TMATRIX, prod1 = NULL_TMATRIX,
        LL = NULL_TMATRIX, M = NULL_TMATRIX, prod2 = NULL_TMATRIX,
-       blk, Lt, st;
+       blk, Lt;
   /* main matrices */
-  st = tm_T(src,&e); 			if(e) goto end_pinv;
   A = pinva(src,&transp,&tol,&e); 	if(e) goto end_pinv;
   n = A.rows;
   L = pinvl(&A,tol,&r,&e); 		if(e) goto end_pinv;
@@ -464,17 +459,18 @@ tMat tm_pinv(tMat *src, int *err)
   prod1 = tm_new(r,r,&e); 		if(e) goto end_pinv; 
   tm_mul(&prod1, &Lt, &LL, &e); 	if(e) goto end_pinv;
   M = tm_inv(&prod1, &e); 		if(e) goto end_pinv;
+  blk = tm_T(src,&e); 			if(e) goto end_pinv;
     
   /* find pseudo inverse*/
-  prod2 = tm_new(1,1,&e); 		if(e) goto end_pinv;
+  prod2 = tm_simp();
   if(transp) {
-    /* st*LL*M*M*Lt  */
-    if(!(tm_mul(&prod2,&st,&LL,&e)    && tm_mul(&prod1,&prod2,&M,&e) &&
+    /* blk*LL*M*M*Lt  */
+    if(!(tm_mul(&prod2,&blk,&LL,&e)    && tm_mul(&prod1,&prod2,&M,&e) &&
          tm_mul(&prod2,&prod1,&M,&e)  && tm_mul(&prod1,&prod2,&Lt,&e))) { goto end_pinv; }
   } else {
-    /* LL*M*M*Lt*st */
+    /* LL*M*M*Lt*blk */
     if(!(tm_mul(&prod2,&LL,&M,&e)     && tm_mul(&prod1,&prod2,&M,&e) &&
-         tm_mul(&prod2,&prod1,&Lt,&e) && tm_mul(&prod1,&prod2,&st,&e))) { goto end_pinv; }
+         tm_mul(&prod2,&prod1,&Lt,&e) && tm_mul(&prod1,&prod2,&blk,&e))) { goto end_pinv; }
   } 
   
 end_pinv:

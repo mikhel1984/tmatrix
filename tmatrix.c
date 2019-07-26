@@ -160,23 +160,22 @@ tmSize tm_cols(tMat* m)
 tMat tm_copy(tMat* src, int* err)
 {
   tmVal* data = NULL, *p;
-  int e = 0;
-  int L, i, j;
+  int e = 0, i, j;
   tMat res = NULL_TMATRIX;
    
   if(src) {
     res.rows = src->rows;
     res.cols = src->cols;
     res.width = res.cols;
-    L = res.rows*res.cols;
-    if(L) {
-      data = (tmVal*) malloc(L * sizeof(tmVal));
+    j = res.rows*res.cols;
+    if(j) {
+      data = (tmVal*) malloc(j * sizeof(tmVal));
       if(data) {
         res.data = data;
         res.type = TM_MAIN;        
         if(IS_PRIM(src)) {
           p = src->data;
-          for(i = 0; i < L; i++) 
+          for(i = 0; i < j; i++) 
             *data++ = *p++;               
         } else {
           for(i = 0; i < res.rows; i++) {
@@ -277,7 +276,7 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
 
 int tm_insert(tMat *dst, tMat *src, int* err) 
 {
-  int e = 0,i,j,R,C;
+  int e = 0, i,j,R,C;
    
   if(dst && src) {
     R = dst->rows;

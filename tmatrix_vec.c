@@ -24,6 +24,7 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
 {
   int e = 0;
   tmVal res = 0;
+
   if(m) {
     if(m->cols == 1) {
       res = tm_get(m,k,0,&e);
@@ -58,12 +59,12 @@ void vec_set(tMat *m, tmSize k, tmVal v, int *err)
 
 tmVal vec_dot(tMat *a, tMat *b, int *err)
 {
-  int e = 0,i,N1,N2;
+  int e = 0,i,N1;
   tmVal sum = 0;
   
-  N1 = vec_len(a); N2 = vec_len(b);
-  if(N1 && N2) {
-    if(N1 == N2) {
+  N1 = vec_len(a); i = vec_len(b);
+  if(N1 && i) {
+    if(N1 == i) {
       if(IS_PRIM(a) && IS_PRIM(b)) {
         for(i = 0; i < N1; i++) 
           sum += a->data[i] * b->data[i];        
