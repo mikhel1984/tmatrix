@@ -6,7 +6,7 @@
 #include "../tmatrix_vec.h"
 #include "minunit.h"
 
-#define eql(X,Y) fabs((X)-(Y)) < 1E-6
+#define EQL(X,Y) fabs((X)-(Y)) < 1E-6
 
 int tests_run = 0;
 char buf[BUFSIZE];
@@ -81,18 +81,18 @@ static char* test_init()
 
   v = tm_get(&m, 1, 1, &err);
   mu_check("Init (get):", err);
-  mu_assert("Init (get): v != 2", eql(v,2));
+  mu_assert("Init (get): v != 2", EQL(v,2));
    
   tm_init(&m, arr, &err);
   mu_check("Init (init):", err);   
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (init): copy error", eql(arr[i],m.data[i])); 
+    mu_assert("Init (init): copy error", EQL(arr[i],m.data[i])); 
   }
    
   cp = tm_copy(&m,&err);
   mu_check("Init (copy):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (copy): wrong result", eql(cp.data[i],m.data[i])); 
+    mu_assert("Init (copy): wrong result", EQL(cp.data[i],m.data[i])); 
   }
   
   tm_print(&m);
@@ -119,23 +119,23 @@ static char* test_transpose()
   mu_check("Transpose (T):", err);
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
-      mu_assert("Transpose (T): wrong result", eql(tm_get(&t,i,j,0), tm_get(&m,j,i,0)));
+      mu_assert("Transpose (T): wrong result", EQL(tm_get(&t,i,j,0), tm_get(&m,j,i,0)));
     }
   }
 
   v = tm_get(&t, 0, 1, &err);
   mu_check("Transpose (get):", err);
-  mu_assert("Transpose (get): m(x,y) != m'(y,x)", eql(v,tm_get(&m,1,0,NULL)));   
+  mu_assert("Transpose (get): m(x,y) != m'(y,x)", EQL(v,tm_get(&m,1,0,NULL)));   
 
   tm_set(&t, 2, 1, 10, &err);
   mu_check("Transpose (set):", err);
-  mu_assert("Transpose (set): m(x,y) != m'(y,x)", eql(10,tm_get(&m,1,2,NULL)));  
+  mu_assert("Transpose (set): m(x,y) != m'(y,x)", EQL(10,tm_get(&m,1,2,NULL)));  
 
   cp = tm_copy(&t,&err);
   mu_check("Transpose (copy):", err);
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
-      mu_assert("Transpose (copy): wrong result", eql(tm_get(&t,i,j,0), tm_get(&cp,i,j,0)));
+      mu_assert("Transpose (copy): wrong result", EQL(tm_get(&t,i,j,0), tm_get(&cp,i,j,0)));
     }
   }
 
@@ -165,20 +165,20 @@ static char* test_submatrix()
   mu_check("Submatrix (get):", err);  
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
-      mu_assert("Submatrix (get): not equal", eql(tm_get(&m,i+1,j+1,0), tm_get(&s,i,j,0)));
+      mu_assert("Submatrix (get): not equal", EQL(tm_get(&m,i+1,j+1,0), tm_get(&s,i,j,0)));
     }
   }
    
   tm_set(&s, 1, 0, 10, &err);
   mu_check("Submatrix (set):", err);  
   v = tm_get(&s,1,0,0); 
-  mu_assert("Submatrix (s): v != 10", eql(v,10));
+  mu_assert("Submatrix (s): v != 10", EQL(v,10));
   
   cp = tm_copy(&s,&err);
   mu_check("Submatrix (copy):", err);
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
-      mu_assert("Submatrix (copy): wrong result", eql(tm_get(&cp,i,j,0), tm_get(&s,i,j,0)));
+      mu_assert("Submatrix (copy): wrong result", EQL(tm_get(&cp,i,j,0), tm_get(&s,i,j,0)));
     }
   }
   
@@ -206,12 +206,12 @@ static char* test_cols()
   mu_assert("Cols (col): wrong indexation", err != 0);
   c2 = tm_col(&m,2,&err);
   mu_check("Cols (col):", err);
-  mu_assert("Cols (get): not equal", eql(tm_get(&c1,1,0,0), tm_get(&m,1,1,0)));
+  mu_assert("Cols (get): not equal", EQL(tm_get(&c1,1,0,0), tm_get(&m,1,1,0)));
   
   tm_insert(&c1,&c2,&err);
   mu_check("Cols (insert):", err);
   for(i = 0; i < 3; i++) {
-      mu_assert("Cols (insert): wrong result", eql(tm_get(&m,i,1,0), tm_get(&m,i,2,0)));    
+      mu_assert("Cols (insert): wrong result", EQL(tm_get(&m,i,1,0), tm_get(&m,i,2,0)));    
   }
     
   return 0;  
@@ -234,19 +234,19 @@ static char* test_sum()
   tm_add(&m1,&m2,&err);
   mu_check("Sum (add):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", eql(m1.data[i], a1[i]+a2[i])); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]+a2[i])); 
   }
    
   tm_sub(&m1,&m2,&err);
   mu_check("Sum (sub):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", eql(m1.data[i], a1[i])); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i])); 
   }
   
   tm_scale(&m1,2,&err);
   mu_check("Sum (scale):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", eql(m1.data[i], a1[i]*2)); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]*2)); 
   }
    
   tm_clear(&m1);
@@ -273,7 +273,7 @@ static char* test_prod()
   tm_mul(&m2, &m1,&m3, &err);
   mu_check("Prod (mul):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Prod (mul): wrong product", eql(m2.data[i], a3[i]));
+    mu_assert("Prod (mul): wrong product", EQL(m2.data[i], a3[i]));
   }
     
   return 0;     
@@ -290,7 +290,7 @@ static char* test_inv()
    
   d = tm_det(&m, &err);
   mu_check("Inv (det):", err);
-  mu_assert("Inv (det): wrong value", eql(d,-76));
+  mu_assert("Inv (det): wrong value", EQL(d,-76));
    
   im = tm_inv(&m, &err);
   mu_check("Inv (det):", err);
@@ -301,7 +301,7 @@ static char* test_inv()
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
       d = (i == j) ? 1 : 0;
-      mu_assert("Inv (inv): wrong matrix", eql(tm_get(&pr,i,j,0),d));
+      mu_assert("Inv (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),d));
     }
   }
   
@@ -310,7 +310,7 @@ static char* test_inv()
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
       d = (i == j) ? 1 : 0;
-      mu_assert("Inv (inv): wrong matrix", eql(tm_get(&pr,i,j,0),d));
+      mu_assert("Inv (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),d));
     }
   }
   
@@ -339,7 +339,7 @@ static char* test_pinv()
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       v = (i == j) ? 1 : 0;
-      mu_assert("Pinv (pinv): wrong matrix", eql(tm_get(&pr,i,j,0),v));
+      mu_assert("Pinv (pinv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
   }
   tm_clear(&im);
@@ -352,7 +352,7 @@ static char* test_pinv()
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       v = (i == j) ? 1 : 0;
-      mu_assert("Pinv (pinv): wrong matrix", eql(tm_get(&pr,i,j,0),v));
+      mu_assert("Pinv (pinv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
   }   
    
@@ -390,7 +390,7 @@ static char* test_homo()
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
       v = (i == j) ? 1 : 0;
-      mu_assert("Homo (inv): wrong matrix", eql(tm_get(&pr,i,j,0),v));       
+      mu_assert("Homo (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));       
     }
   }   
   tm_clear(&cp);
@@ -402,7 +402,7 @@ static char* test_homo()
   mu_check("Homo (T):", err);  
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
-      mu_assert("Homo (T): wrong matrix", eql(tm_get(&m2,i,j,0),tm_get(&cp,j,i,0))); 
+      mu_assert("Homo (T): wrong matrix", EQL(tm_get(&m2,i,j,0),tm_get(&cp,j,i,0))); 
     }
   }
    
@@ -412,7 +412,7 @@ static char* test_homo()
   mu_check("Homo (mul):", err); 
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
-      mu_assert("Homo (mul): wrong matrix", eql(tm_get(&m1,i,j,0),tm_get(&pr,i,j,0))); 
+      mu_assert("Homo (mul): wrong matrix", EQL(tm_get(&m1,i,j,0),tm_get(&pr,i,j,0))); 
     }
   }
      
@@ -433,7 +433,7 @@ static char* test_vec()
   v1 = vec_static(3,a1,&err);
   mu_check("Vec (static):", err);
   
-  mu_assert("Vec (get): wrong value", eql(vec_get(&v1,0,0),1));
+  mu_assert("Vec (get): wrong value", EQL(vec_get(&v1,0,0),1));
   
   v2 = tm_static(3,3,a1,&err);
   mu_check("Vec (static):", err);
@@ -442,14 +442,14 @@ static char* test_vec()
   
   d = vec_dot(&v1,&v2,&err);
   mu_check("Vec (dot):", err);
-  mu_assert("Vec (dot): wrong result", eql(d,48));
+  mu_assert("Vec (dot): wrong result", EQL(d,48));
   
   pr = tm_simp();
   vec_cross(&pr,&v1,&v2,&err);
   mu_check("Vec (cross):", err);
   
   for(i = 0; i < 3; i++) {
-    mu_assert("Vec (cross): wrong product", eql(vec_get(&pr,i,0),a2[i]));
+    mu_assert("Vec (cross): wrong product", EQL(vec_get(&pr,i,0),a2[i]));
   }
     
   tm_clear(&pr);
