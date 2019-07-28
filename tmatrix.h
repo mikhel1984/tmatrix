@@ -13,11 +13,13 @@
 #define T_MATRIX_H
 
 /** 
- * @brief Empty matrix initialization 
+ * @brief Constants.
  */
-#define NULL_TMATRIX {0,0,0,0,0}
+#define NULL_TMATRIX {0,0,0,0,0}  /**< Empty matrix initialization. */
+#define TM_VERTICAL   1           /**< Vertical concatenation. */
+#define TM_HORIZONTAL 0           /**< Horizontal concatenation. */
 /** 
- * @brief Return empty matrix with dynamically allocated memory.
+ * @brief Get empty matrix with dynamically allocated memory.
  */
 #define tm_simp()          tm_new(0,0,0)
 /**
@@ -175,13 +177,43 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err);
  * @return 1 in case of success. 
  */
 int tm_insert(tMat *dst, tMat *src, int* err);
+/**
+ * @brief Make new matrix, based on list of source matrices and some rule.
+ * 
+ * Rule could be defined via function, which define element value for given index in final matrix. 
+ * @param src list of matrices.
+ * @param N for example, number of matrices in list (usage depends on rule).
+ * @param R final number of rows.
+ * @param C final number of columns.
+ * @param rule function, which define value for the given index and list of matrices.
+ * @param err error code.
+ * @return The constructed matrix.
+ * @note Free memory with @a tm_clear.
+ */
+tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, tmVal (*rule)(tMat*,tmSize,tmSize,tmSize,int*), int* err);
+/**
+ * @brief Concatenate matrices in the list.
+ * @param src list of source matrices.
+ * @param N length of the list.
+ * @param dir direction (0 - horizontal, 1 - vertical).
+ * @param err error code.
+ * @return Result of concatenation.
+ * @note Free memory with @a tm_clear.
+ */
+tMat tm_concat(tMat src[], int N, int dir, int* err);
 /** 
  * @brief Simple matrix visualization.
  * @param m matrix object. 
  */
 void tm_print(tMat *m);
+/**
+ * @brief Error description.
+ * @param code error value.
+ * @return Description string.
+ */
+const char* tm_error(int code);
 
-/*============== Arithmetic methods ==============*/
+/*============== Arithmetic methods etc. ==============*/
 
 /** 
  * @brief Add two matrices.
@@ -253,12 +285,6 @@ tMat tm_inv(tMat *m, int *err);
  * @note Free memory with @a tm_clear.
  */
 tMat tm_pinv(tMat *m, int *err);
-/**
- * @brief Error description.
- * @param code error value.
- * @return Description string.
- */
-const char* tm_error(int code);
 /**
  * @brief Find rank of the matrix.
  * @param m matrix object.

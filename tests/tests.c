@@ -26,6 +26,7 @@ static char* test_pinv();
 static char* test_homo();
 static char* test_vec();
 static char* test_rank();
+static char* test_make();
 
 /* ~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -61,6 +62,7 @@ static char* all_tests()
   mu_run(test_homo);
   mu_run(test_vec);
   mu_run(test_rank);
+  mu_run(test_make);
   
   return 0;
 }
@@ -479,3 +481,67 @@ static char* test_rank()
 
   return 0;
 }
+
+/* one of minor values */
+tmVal minor00(tMat *m, tmSize N, tmSize r, tmSize c, int* err)
+{
+  /* N is used as a matrix index in this example */
+  return tm_get(m+N, r+1, c+1, err);
+}
+
+static char* test_make()
+{
+  int err = 0, i, j;
+  tmVal e1,e2;
+  tmVal a1[4] = {1,2,3,4}, a2[4] = {5,6,7,8};
+  tMat m[2], c1,c2,c3;
+  
+  m[0] = tm_static(2,2,a1,0);
+  m[1] = tm_static(2,2,a2,0);
+  
+  c1 = tm_concat(m,2,TM_HORIZONTAL,&err);
+  mu_check("Make (concat h):", err);
+    
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      e1 = tm_get(m,i,j,&err);
+      mu_check("Make (get):", err);
+      e2 = tm_get(&c1,i,j,&err);
+      mu_check("Make (get):", err);
+      mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
+      e1 = tm_get(m+1,i,j,&err);
+      mu_check("Make (get):", err);
+      e2 = tm_get(&c1,i,j+2,&err);
+      mu_check("Make (get):", err);
+      mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
+    }
+  }
+  
+  c1 = tm_concat(m,2,TM_VERTICAL,&err);
+  mu_check("Make (concat v):", err);
+  
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      e1 = tm_get(m,i,j,&err);
+      mu_check("Make (get):", err);
+      e2 = tm_get(&c1,i,j,&err);
+      mu_check("Make (get):", err);
+      mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
+      e1 = tm_get(m+1,i,j,&err);
+      mu_check("Make (get):", err);
+      e2 = tm_get(&c1,i+2,j,&err);
+      mu_check("Make (get):", err);
+      mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
+    }
+  }
+  
+  c3 = tm_make(m,0,m[0].rows-1,m[0].cols-1,minor00,&err);
+  mu_check("Make (make):", err);
+  mu_assert("Make (make): wrong value", EQL(tm_get(m,1,1,0),tm_get(&c3,0,0,0)));   
+  
+  tm_clear(&c1);
+  tm_clear(&c2);
+  tm_clear(&c3);
+  
+  return 0;
+} 

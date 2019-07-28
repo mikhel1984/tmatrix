@@ -15,6 +15,7 @@ tmVal* tm_at(tMat* m, tmSize r, tmSize c) {
                                    : (m->data + (r * m->width + c));
 }
 
+/* New zero matrix */ 
 tMat tm_new(tmSize r, tmSize c, int* err) 
 {
   int e = 0;
@@ -38,6 +39,7 @@ tMat tm_new(tmSize r, tmSize c, int* err)
   return res;
 }
 
+/* New identity matrix */
 tMat tm_eye(tmSize r, tmSize c, int *err)
 {
   int e = 0, n1 = c+1, n2 = r*c, i;
@@ -53,6 +55,7 @@ tMat tm_eye(tmSize r, tmSize c, int *err)
   return res;
 }
 
+/* Matrix with static preallocated memory */
 tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
 {
   tMat res = NULL_TMATRIX;
@@ -75,6 +78,7 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
   return res;
 }
 
+/* Free dynamically allocated memory */
 void tm_clear(tMat* matrix) 
 {
   if(matrix && matrix->type == TM_MAIN) {
@@ -85,6 +89,7 @@ void tm_clear(tMat* matrix)
   }
 }
 
+/* Copy values from array */
 int tm_init(tMat* dst, tmVal src[], int* err) {
   int i,j,R,C, e=0;
   tmVal *data;
@@ -114,6 +119,7 @@ int tm_init(tMat* dst, tmVal src[], int* err) {
   return !e;    
 }
 
+/* "Protected" getter */
 tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err)
 {
   int e = 0;
@@ -132,6 +138,7 @@ tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err)
   return res;
 }
 
+/* "Protected" setter */
 void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err)
 {
   int e = 0;
@@ -147,16 +154,19 @@ void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err)
   if(err) *err = e;  
 }
 
+/* Get row number */
 tmSize tm_rows(tMat* m) 
 { 
   return m ? m->rows : 0;
 }
 
+/* Get column number */
 tmSize tm_cols(tMat* m) 
 {
   return m ? m->cols : 0;
 }
 
+/* Create matrix copy */
 tMat tm_copy(tMat* src, int* err)
 {
   tmVal* data = NULL, *p;
@@ -195,6 +205,7 @@ tMat tm_copy(tMat* src, int* err)
   return res;
 }
 
+/* Simple matrix visualization */
 void tm_print(tMat *m)
 {
   int i, j, R, C;
@@ -228,6 +239,7 @@ void tm_print(tMat *m)
   }
 }
 
+/* Get transposed version of the matrix */
 tMat tm_T(tMat* src, int *err) 
 {
   tMat res = NULL_TMATRIX;
@@ -249,6 +261,7 @@ tMat tm_T(tMat* src, int *err)
   return res;
 }
 
+/* Get sub-matrix */
 tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
 {
   tMat res = NULL_TMATRIX;
@@ -274,6 +287,7 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
   return res;
 }
 
+/* Copy values from one matrix to another */
 int tm_insert(tMat *dst, tMat *src, int* err) 
 {
   int e = 0, i,j,R,C;
@@ -296,6 +310,7 @@ int tm_insert(tMat *dst, tMat *src, int* err)
   return !e; 
 }
 
+/* Error desctiption */
 const char* tm_error(int code)
 {
   static char *list[TM_ERR_TOTAL] = {
@@ -314,7 +329,116 @@ const char* tm_error(int code)
   if(code == 0)
     return "No errors";
   else if(code >= TM_ERR_TOTAL || code < 0)
-    return "Wrong error code";
+    return "Unknown error code";
     
   return list[--code];
 }
+
+/* Create matrix from list of matrices and some rule */
+tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, 
+             tmVal (*rule)(tMat*,tmSize,tmSize,tmSize,int*), int* err)
+{
+  int e = 0,i,j;
+  tmVal *data = NULL;
+  tMat res = NULL_TMATRIX;  
+  res.type = TM_MAIN;
+  
+  if(src && rule) {
+    if(R && C) {
+      data = (tmVal*) calloc(R*C, sizeof(tmVal));
+      if(data) {
+        /* initialize matrix */
+        res.data = data;
+        res.rows = R;
+        res.width = res.cols = C; 
+        /* find values */ 
+        for(i = 0; !e && i < R; i++) {
+          for(j = 0; !e && j < C; j++) 
+            *data++ = rule(src,N,i,j,&e);          
+        }   
+      } else 
+        e = TM_ERR_NO_MEMORY; 
+    } else 
+      e = TM_ERR_WRONG_SIZE;
+  } else 
+    e = TM_ERR_EMPTY_ARGS;
+    
+  if(err) *err = e;
+  
+  return res;
+}
+
+tmVal concatv(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
+{
+  int i = 0;
+  
+  while(i < N && r >= src[i].rows) r -= src[i++].rows;
+  
+  if(i >= N) {
+    if(err) *err = TM_ERR_WRONG_SIZE;
+    return 0;
+  }
+  
+  return *tm_at(src+i,r,c);  
+}
+
+tmVal concath(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
+{
+  int i = 0;
+  
+  while(i < N && c >= src[i].cols) c -= src[i++].cols;
+  
+  if(i >= N) {
+    if(err) *err = TM_ERR_WRONG_SIZE;
+    return 0;
+  }
+  
+  return *tm_at(src+i,r,c);  
+}
+
+tMat tm_concat(tMat src[], int N, int dir, int* err)
+{
+  int e = 0, i, r,c;
+  tMat res = NULL_TMATRIX;  
+  
+  if(src) {
+    if(N > 0) {
+      switch(dir) {
+      case 0: /* horizontal concatenation */
+        c = src[0].cols;
+        r = src[0].rows;
+        for(i = 1; i < N; i++) {
+          if(src[i].rows != r) {
+            e = TM_ERR_NOT_COMPAT;
+            goto end_concat;
+          }
+          c += src[i].cols;
+        }
+        res = tm_make(src,N,r,c,concath,&e);
+        break;
+      case 1: /* vertical concatenation */
+        r = src[0].rows;
+        c = src[0].cols;
+        for(i = 1; i < N; i++) {
+          if(src[i].cols != c) {
+            e = TM_ERR_NOT_COMPAT;
+            goto end_concat;
+          }
+          r += src[i].rows;
+        }
+        res = tm_make(src,N,r,c,concatv,&e);
+        break;
+      default:
+        e = TM_ERR_WRONG_SIZE;
+        break;
+      }
+    } else 
+      e = TM_ERR_WRONG_SIZE;    
+  } else 
+    e = TM_ERR_EMPTY_ARGS;
+
+end_concat:
+  if(err) *err = e;
+  
+  return res;
+} 
