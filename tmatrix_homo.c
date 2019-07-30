@@ -162,7 +162,7 @@ int h_T(tMat *dst, int *err)
 
 int h_eye(tMat *dst, int *err)
 {
-  tmVal arr[TM_HOMO_SIZE] = HOMO_MASK;
+  static tmVal arr[TM_HOMO_SIZE] = HOMO_MASK;
   
   return is_homogenous(dst,err) && copy_data(dst,arr);
 }

@@ -27,9 +27,15 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
 
   if(m) {
     if(m->cols == 1) {
-      res = tm_get(m,k,0,&e);
+      if(k < m->rows)
+        res = *tm_at(m,k,0);
+      else 
+        e = TM_ERR_WRONG_SIZE;      
     } else if(m->rows == 1) {
-      res = tm_get(m,0,k,&e);
+      if(k < m->cols)
+        res = *tm_at(m,0,k);
+      else 
+        e = TM_ERR_WRONG_SIZE;      
     } else 
       e = TM_ERR_NOT_VEC;
   } else 
