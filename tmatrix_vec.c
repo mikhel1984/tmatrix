@@ -5,6 +5,7 @@
  * @brief Vector specific operations.
  */ 
 #include <stdlib.h>
+#include <math.h>
 #include "tmatrix_vec.h"
 #include "tmatrix_priv.h"
 
@@ -27,11 +28,13 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
 
   if(m) {
     if(m->cols == 1) {
+      /* column vector */
       if(k < m->rows)
         res = *tm_at(m,k,0);
       else 
         e = TM_ERR_WRONG_SIZE;      
     } else if(m->rows == 1) {
+      /* row vector */
       if(k < m->cols)
         res = *tm_at(m,0,k);
       else 
@@ -52,9 +55,17 @@ void vec_set(tMat *m, tmSize k, tmVal v, int *err)
   
   if(m) {
     if(m->cols == 1) {
-      tm_set(m,k,0,v,&e);
+      /* column vector */      
+      if(k < m->rows)
+        *tm_at(m,k,0) = v;
+      else 
+        e = TM_ERR_WRONG_SIZE; 
     } else if(m->rows == 1) {
-      tm_set(m,0,k,v,&e);      
+      /* row vector */      
+      if(k < m->cols)
+        *tm_at(m,0,k) = v;
+      else 
+        e = TM_ERR_WRONG_SIZE;          
     } else 
       e = TM_ERR_NOT_VEC;
   } else 
@@ -130,5 +141,71 @@ int vec_cross(tMat *res, tMat *a, tMat *b, int *err)
   if(err) *err = e;
   
   return !e;  
+}
+
+tmVal vec_norm2(tMat *m, int *err)
+{
+  int e = 0, i;
+  tmVal sum = 0, v;
+  
+  if(m) {
+    if(m->cols == 1) {
+      /* column vector */
+      for(i = 0; i < m->rows; i++) {
+        v = *tm_at(m,i,0);
+        sum += v * v;
+      }
+    } else if(m->rows == 1) {
+      /* row vector */
+      for(i = 0; i < m->cols; i++) {
+        v = *tm_at(m,0,i);
+        sum += v * v;
+      }
+    } else 
+      e = TM_ERR_NOT_VEC;
+  } else 
+    e = TM_ERR_EMPTY_ARGS;
+    
+  if(err) *err = e;
+  
+  return sum;
+}
+
+int vec_normalize(tMat *m, int *err)
+{
+  int e = 0, i;
+  tmVal sum = 0, v;
+  
+  if(m) {    
+    if(m->cols == 1) {
+      /* column vector */
+      for(i = 0; i < m->rows; i++) {
+        v = *tm_at(m,i,0);
+        sum += v * v;
+      }      
+      if(sum > 0) {
+        sum = sqrt(sum);
+        for(i = 0; i < m->rows; i++) 
+          *tm_at(m,i,0) /= sum;
+      }
+    } else if(m->rows == 1) {
+      /* row vector */
+      for(i = 0; i < m->cols; i++) {
+        v = *tm_at(m,0,i);
+        sum += v * v;
+      }      
+      if(sum > 0) {
+        sum = sqrt(sum);
+        for(i = 0; i < m->cols; i++) 
+          *tm_at(m,0,i) /= sum;
+      }
+    } else 
+      e = TM_ERR_NOT_VEC;    
+  } else 
+    e = TM_ERR_EMPTY_ARGS;
+    
+  if(err) *err = e;
+  
+  return !e;
 }
 

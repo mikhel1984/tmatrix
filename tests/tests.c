@@ -437,6 +437,10 @@ static char* test_vec()
   
   mu_assert("Vec (get): wrong value", EQL(vec_get(&v1,0,0),1));
   
+  d = vec_norm2(&v1,&err);
+  mu_check("Vec (norm2):", err);
+  mu_assert("Vec (norm2):", EQL(d, a1[0]*a1[0]+a1[1]*a1[1]+a1[2]*a1[2]));
+  
   v2 = tm_static(3,3,a1,&err);
   mu_check("Vec (static):", err);
   v2 = tm_col(&v2,1,&err);
@@ -453,6 +457,10 @@ static char* test_vec()
   for(i = 0; i < 3; i++) {
     mu_assert("Vec (cross): wrong product", EQL(vec_get(&pr,i,0),a2[i]));
   }
+  
+  vec_normalize(&v1,&err);
+  mu_check("Vec (normalize):", err);
+  mu_assert("Vec (normalize):", EQL(1.0, a1[0]*a1[0]+a1[1]*a1[1]+a1[2]*a1[2]));
     
   tm_clear(&pr);
   

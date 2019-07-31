@@ -64,7 +64,7 @@ typedef struct tMat_ {
  * @param r number of rows.
  * @param c number of columns.
  * @param err error code.
- * @return New matrix. 
+ * @return New zero matrix. 
  * @note Free memory with @a tm_clear.
  */
 tMat tm_new(tmSize r, tmSize c, int* err);

@@ -70,5 +70,23 @@ tmVal vec_dot(tMat *a, tMat *b, int *err);
  * @return 1 in case of success.
  */
 int vec_cross(tMat *res, tMat *a, tMat *b, int *err);
+/**
+ * @brief Find square of Eucledian norm.
+ *
+ * The function calculates sum of squares for vector elements.
+ * @param m matrix object.
+ * @param err error code.
+ * @return Square norm.
+ */
+tmVal vec_norm2(tMat *m, int *err);
+/**
+ * @brief Normalize vector.
+ * 
+ * Obtaine unit vector if its norm is not 0.
+ * @param m matrix object.
+ * @param err error code.
+ * @return 1 in case of success.
+ */
+int vec_normalize(tMat *m, int *err);
 
 #endif /* T_MATRIX_VECTOR_H */
