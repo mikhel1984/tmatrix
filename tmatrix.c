@@ -15,6 +15,36 @@ tmVal* tm_at(tMat* m, tmSize r, tmSize c) {
                                    : (m->data + (r * m->width + c));
 }
 
+/* "Private", check size and allocate memory if need */
+int tm_relevant(tMat* m, tmSize R, tmSize C, int* err)
+{
+  int e = 0, N;
+  tmVal *data;
+  
+  if(m->rows != R || m->cols != C) {
+    if(m->type == TM_MAIN) {
+      N = R * C;
+      if(m->rows * m->cols < N) {
+        data = (tmVal*) malloc(N * sizeof(tmVal));
+        if(data) {
+          free(m->data);
+          m->data = data;
+        } else 
+          e = TM_ERR_NO_MEMORY;
+      }
+      if(!e) {
+        m->rows = R;
+        m->width = m->cols = C;
+      }
+    } else 
+      e = TM_ERR_NOT_MAIN;
+  }
+  
+  if(err) *err = e;
+  
+  return !e;
+}
+
 /* New zero matrix */ 
 tMat tm_new(tmSize r, tmSize c, int* err) 
 {
@@ -26,8 +56,7 @@ tMat tm_new(tmSize r, tmSize c, int* err)
     res.data = (tmVal*) calloc(r*c, sizeof(tmVal));
     if(res.data) {
       res.rows = r;
-      res.cols = c;
-      res.width = c;      
+      res.width = res.cols = c;    
     } else 
       e = TM_ERR_NO_MEMORY;      
   } else if(!r && !c) {}    /* allow empty matrix for further usage in tm_mul */
@@ -65,8 +94,7 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
     if(dat) {
       res.data = dat;
       res.rows = r;
-      res.cols = c;
-      res.width = c;
+      res.width = res.cols = c;
       res.type = TM_STATIC;      
     } else 
       e = TM_ERR_EMPTY_ARGS;
@@ -244,7 +272,7 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
         res.type = TM_SUB;
         res.rows = Nr;
         res.cols = Nc;
-        res.data = src->data + (r0*src->cols + c0);
+        res.data = src->data + (r0*src->width + c0);
       } else 
         e = TM_ERR_WRONG_SIZE;
    } else 
@@ -338,6 +366,8 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C,
   return res;
 }
 
+/*		Concatenation function		*/
+/* Vectical concatenation */
 tmVal concatv(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
 {
   int i = 0;
@@ -352,6 +382,7 @@ tmVal concatv(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
   return *tm_at(src+i,r,c);  
 }
 
+/* Horizontal concatenation */
 tmVal concath(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
 {
   int i = 0;
@@ -366,6 +397,7 @@ tmVal concath(tMat src[], tmSize N, tmSize r, tmSize c, int* err)
   return *tm_at(src+i,r,c);  
 }
 
+/* General case */
 tMat tm_concat(tMat src[], int N, int dir, int* err)
 {
   int e = 0, i, r,c;
@@ -412,3 +444,4 @@ end_concat:
   
   return res;
 } 
+/*		End concatenation 		*/

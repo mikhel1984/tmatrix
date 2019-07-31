@@ -46,5 +46,14 @@ enum TM_ERR {
  * @return Pointer to matrix element.
  */
 tmVal* tm_at(tMat* m, tmSize r, tmSize c);
+/**
+ * @brief Check matrix size, correct if need and possible.
+ * @param m matrix object.
+ * @param R desired number of rows.
+ * @param C desired number of columns.
+ * @param err error code.
+ * @return 1 in case of success.
+ */
+int tm_relevant(tMat* m, tmSize R, tmSize C, int* err);
 
 #endif /* T_MATRIX_PRIVATE_H */

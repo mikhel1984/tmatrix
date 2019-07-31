@@ -14,6 +14,7 @@
 #define PINV_TOL     1E-9
 #define MEM_TMP_VEC 8
 
+
 int tm_add(tMat *dst, tMat* m, int* err) 
 {
   int i,j,R,C, e = 0;
@@ -109,9 +110,9 @@ int tm_scale(tMat *dst, tmVal k, int* err)
 
 int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
 {
-  tmSize R1,C1,C2,R3,C3;
+  tmSize R1,C1,C2;
   int i,j,k, e = 0;
-  tmVal* data, acc;
+  tmVal acc;
    
   if(dst && a && b) {
     if(dst != a && dst != b) {
@@ -120,41 +121,17 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
       C2 = b->cols;
       if(C1 == b->rows) {
         /* check destination */
-        R3 = dst->rows; C3 = dst->cols; 
-        if(R3 != R1 || C3 != C2) { 
-          /* if the size is equal, any type is acceptable, otherwise only dynamic */
-          if(dst->type == TM_MAIN) {
-            k = R1 * C2;
-            if(R3 * C3 < k) {              
-              /* get new memory */
-              data = (tmVal*) malloc(k*sizeof(tmVal));
-              if(data) {
-                free(dst->data);
-                dst->data = data;  
-              } else 
-                e = TM_ERR_NO_MEMORY;                                 
-            }               
-          } else 
-            e = TM_ERR_NOT_MAIN;
-          if(!e) {
-            /* change size */
-            dst->rows = R1;
-            dst->cols = C2;
-            dst->width = C2;
-          } else {
-            if(err) *err = e;
-            return !e;
-          }
-        }   
-        /* evaluate result */
-        for(i = 0; i < R1; i++) {
-          for(j = 0; j < C2; j++) {
-            acc = 0;
-            for(k = 0; k < C1; k++) 
-              acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));            
-            *tm_at(dst,i,j) = acc;
-          }
-        }      
+        if(tm_relevant(dst,R1,C2,err)) {  
+          /* evaluate result */
+          for(i = 0; i < R1; i++) {
+            for(j = 0; j < C2; j++) {
+              acc = 0;
+              for(k = 0; k < C1; k++) 
+                acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));            
+              *tm_at(dst,i,j) = acc;
+            }
+          } 
+        }     
       } else 
         e = TM_ERR_NOT_COMPAT;         
     } else 

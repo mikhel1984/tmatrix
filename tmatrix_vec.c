@@ -102,37 +102,17 @@ tmVal vec_dot(tMat *a, tMat *b, int *err)
 int vec_cross(tMat *res, tMat *a, tMat *b, int *err)
 {
   int e = 0;
-  tmVal *data = 0, a0,a1,a2,b0,b1,b2;
-  
+  tmVal a0,a1,a2,b0,b1,b2;  
   
   if(res && a && b) {
     if(vec_len(a) == 3 && vec_len(b) == 3) {
-      if(vec_len(res) != 3) {
-        if(res->type == TM_MAIN) {
-          if(res->rows * res->cols < 3) {            
-            data = (tmVal*) malloc(3*sizeof(tmVal));
-            if(data) {
-              free(res->data);
-              res->data = data;
-            } else 
-              e = TM_ERR_NO_MEMORY;            
-            if(!e) {
-              res->rows = 3;
-              res->cols = 1;
-              res->width = 1;
-            } else {
-              if(err) *err = e;
-              return !e;
-            }
-          }          
-        } else 
-          e = TM_ERR_NOT_MAIN; 
-      }
-      a0 = vec_get(a,0,0); a1 = vec_get(a,1,0); a2 = vec_get(a,2,0);
-      b0 = vec_get(b,0,0); b1 = vec_get(b,1,0); b2 = vec_get(b,2,0);
-      if(!e) vec_set(res,0,a1*b2-b1*a2,&e);
-      if(!e) vec_set(res,1,a2*b0-a0*b2,&e);
-      if(!e) vec_set(res,2,a0*b1-b0*a1,&e);      
+      if(tm_relevant(res,3,1,&e) || (e == TM_ERR_NOT_MAIN && tm_relevant(res,1,3,&e))) { 
+        a0 = vec_get(a,0,0); a1 = vec_get(a,1,0); a2 = vec_get(a,2,0);
+        b0 = vec_get(b,0,0); b1 = vec_get(b,1,0); b2 = vec_get(b,2,0);
+        vec_set(res,0, a1*b2 - b1*a2, 0);
+        vec_set(res,1, a2*b0 - a0*b2, 0);
+        vec_set(res,2, a0*b1 - b0*a1, 0); 
+      }     
     } else
       e = TM_ERR_NOT_DEF;
   } else 
