@@ -89,36 +89,6 @@ void tm_clear(tMat* matrix)
   }
 }
 
-/* Copy values from array */
-int tm_init(tMat* dst, tmVal src[], int* err) {
-  int i,j,R,C, e=0;
-  tmVal *data;
-   
-  if(dst && src) {
-    R = dst->rows;
-    C = dst->cols;    
-
-    if(IS_PRIM(dst)) {
-      /* just copy array */
-      R *= C;
-      data = dst->data;
-      for(i = 0; i < R; i++) 
-        *data++ = *src++;         
-    } else {
-      /* copy for each row and column */
-      for(i = 0; i < R; i++) {
-        for(j = 0; j < C; j++) 
-          *tm_at(dst,i,j) = *src++;          
-      }
-    }
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
-   
-  if(err) *err = e; 
-   
-  return !e;    
-}
-
 /* "Protected" getter */
 tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err)
 {

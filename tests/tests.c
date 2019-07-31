@@ -75,7 +75,7 @@ static char* test_init()
     0,1,2,
     3,4,5,
     6,7,0};
-  tMat cp, m = tm_new(3,3,&err);
+  tMat cp, m = tm_new(3,3,&err), m2;
   mu_check("Init (new):", err);
    
   tm_set(&m, 1, 1, 2, &err);
@@ -85,16 +85,16 @@ static char* test_init()
   mu_check("Init (get):", err);
   mu_assert("Init (get): v != 2", EQL(v,2));
    
-  tm_init(&m, arr, &err);
-  mu_check("Init (init):", err);   
+  m2 = tm_static(3,3, arr, &err);
+  mu_check("Init (static):", err);   
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (init): copy error", EQL(arr[i],m.data[i])); 
+    mu_assert("Init (static): copy error", EQL(arr[i],m2.data[i])); 
   }
    
-  cp = tm_copy(&m,&err);
+  cp = tm_copy(&m2,&err);
   mu_check("Init (copy):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (copy): wrong result", EQL(cp.data[i],m.data[i])); 
+    mu_assert("Init (copy): wrong result", EQL(cp.data[i],m2.data[i])); 
   }
   
   tm_print(&m);
@@ -224,12 +224,12 @@ static char* test_sum()
   int err = 0, i;
   tmVal a1[9] = {1,2,3,4,5,6,7,8,9};
   tmVal a2[9] = {3,5,7,2,4,8,0,6,9};
-  tMat m1, m2;
+  tMat m1, m2, m0;
    
-  m1 = tm_new(3,3,&err);
-  mu_check("Sum (new):", err);
-  tm_init(&m1,a1,&err);
-  mu_check("Sum (init):", err);
+  m0 = tm_static(3,3,a1,&err);
+  mu_check("Sum (static):", err);
+  m1 = tm_copy(&m0,&err);
+  mu_check("Sum (copy):", err);
   m2 = tm_static(3,3,a2,&err);
   mu_check("Sum (static):", err);
    

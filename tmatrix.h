@@ -97,16 +97,6 @@ tMat tm_eye(tmSize r, tmSize c, int *err);
  * @param m pointer to matrix.
  */
 void tm_clear(tMat* m);
-/**  
- * @brief Copy numbers from array into the matrix.
- * 
- * It is assumed that the array represents data row by row.
- * @param dst destination matrix.
- * @param src array of numbers.
- * @param err error code.
- * @return 1 in case of success. 
- */
-int tm_init(tMat* dst, tmVal src[], int* err);
 /** 
  * @brief Get matrix element.
  * @param m matrix object.
