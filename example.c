@@ -5,8 +5,8 @@
   Rz - Tz - Ry - Tz - Ry - Tz - Rx - Tz - Ry - Tz - Rx - Tz
 */
 #include <stdio.h>
-#include "tmatrix_homo.h"
-#include "tmatrix_vec.h"
+#include "lib/tmatrix_homo.h"
+#include "lib/tmatrix_vec.h"
 
 #define JOINT_NO 6   /* number of joints */
 #define CART_NO  6   /* number of coordinates in Cartesian space */
