@@ -15,17 +15,17 @@
 int is_homogenous(tMat *m, int *err)
 {
   int e = 0;
-  if(m) {
-    if(IS_PRIM(m)) {
-      if(m->rows != HOMO_SIDE || m->cols != HOMO_SIDE) 
-        e = TM_ERR_NOT_HOMO;
-    } else 
-      e = TM_ERR_NOT_MAIN;
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
-  
-  if(err) *err = e;
 
+  TM_ASSERT_ARGS(m, e, end_homogenous);
+
+  if(IS_PRIM(m)) {
+    if(m->rows != HOMO_SIDE || m->cols != HOMO_SIDE) 
+      e = TM_ERR_NOT_HOMO;
+  } else 
+    e = TM_ERR_NOT_MAIN;
+  
+end_homogenous:
+  if(err) *err = e;
   return !e;
 }
 

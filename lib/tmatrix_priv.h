@@ -39,6 +39,15 @@ enum TM_ERR {
 };
 
 /**
+ * @brief Macro for safety parameters.
+ */
+#ifdef TM_CHECK_ARGS
+#define TM_ASSERT_ARGS(cond,var,lbl)  if(!(cond)) {var = TM_ERR_EMPTY_ARGS; goto lbl;}
+#else
+#define TM_ASSERT_ARGS(cond,var,lbl)  ((void)0)
+#endif
+
+/**
  * @brief Fast memory access without additional checking.
  * @param m matrix object.
  * @param r row index.

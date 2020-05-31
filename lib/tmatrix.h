@@ -12,6 +12,13 @@
 #ifndef T_MATRIX_H
 #define T_MATRIX_H
 
+/**
+ * @brief Safety settings.
+ *
+ * Comment it to disable checking.
+ */
+#define TM_CHECK_ARGS             /**< Check correctness of the function arguments */
+
 /** 
  * @brief Constants.
  */

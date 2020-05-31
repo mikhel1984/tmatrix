@@ -19,31 +19,30 @@ int tm_add(tMat *dst, tMat* m, int* err)
 {
   int i,j,R,C, e = 0;
   tmVal *p1, *p2;
+
+  TM_ASSERT_ARGS(dst && m, e, end_add);
    
-  if(dst && m) {         
-    R = m->rows; C = m->cols;         
-    if(dst->rows == R && dst->cols == C) {
-      /* equal */
-      if(IS_PRIM(dst) && IS_PRIM(m)) {
-        /* just add element-wise */
-        R *= C;    /* reuse variable */
-        p1 = dst->data; p2 = m->data;
-        for(i = 0; i < R; i++)  
-          *p1++ += *p2++;                       
-      } else {
-        /* use method 'at' */        
-        for(i = 0; i < R; i++) {
-          for(j = 0; j < C; j++) 
-            *tm_at(dst,i,j) += *tm_at(m,i,j);	          
-        }
-      }           
-    } else 
-      e = TM_ERR_WRONG_SIZE;                  
-  } else    
-    e = TM_ERR_EMPTY_ARGS;
+  R = m->rows; C = m->cols;         
+  if(dst->rows == R && dst->cols == C) {
+    /* equal */
+    if(IS_PRIM(dst) && IS_PRIM(m)) {
+      /* just add element-wise */
+      R *= C;    /* reuse variable */
+      p1 = dst->data; p2 = m->data;
+      for(i = 0; i < R; i++)  
+        *p1++ += *p2++;                       
+    } else {
+      /* use method 'at' */        
+      for(i = 0; i < R; i++) {
+        for(j = 0; j < C; j++) 
+          *tm_at(dst,i,j) += *tm_at(m,i,j);	          
+      }
+    }           
+  } else 
+    e = TM_ERR_WRONG_SIZE;                  
            
+end_add:
   if(err) *err = e;
-   
   return !e;
 }
 
@@ -51,32 +50,31 @@ int tm_sub(tMat *dst, tMat* m, int* err)
 {
   int i,j,R,C, e = 0;
   tmVal *p1,*p2;
+
+  TM_ASSERT_ARGS(dst && m, e, end_sub);
    
-  if(dst && m) {
-    R = m->rows; C = m->cols;
-    if(dst->rows == R && dst->cols == C) {
-      /* equal */
+  R = m->rows; C = m->cols;
+  if(dst->rows == R && dst->cols == C) {
+    /* equal */
+    p1 = dst->data; p2 = m->data;
+    if(IS_PRIM(dst) && IS_PRIM(m)) {
+      /* element-wise */
+      R *= C;
       p1 = dst->data; p2 = m->data;
-      if(IS_PRIM(dst) && IS_PRIM(m)) {
-        /* element-wise */
-        R *= C;
-        p1 = dst->data; p2 = m->data;
-        for(i = 0; i < R; i++) 
-          *p1++ -= *p2++;              
-      } else {
-        /* use method 'at' */
-        for(i = 0; i < R; i++) {
-          for(j = 0; j < C; j++) 
-            *tm_at(dst,i,j) -= *tm_at(m,i,j);	          
-        }
-      }           
-    } else 
-      e = TM_ERR_WRONG_SIZE;
-  } else    
-    e = TM_ERR_EMPTY_ARGS;
-     
+      for(i = 0; i < R; i++) 
+        *p1++ -= *p2++;              
+    } else {
+      /* use method 'at' */
+      for(i = 0; i < R; i++) {
+        for(j = 0; j < C; j++) 
+          *tm_at(dst,i,j) -= *tm_at(m,i,j);	          
+      }
+    }           
+  } else 
+    e = TM_ERR_WRONG_SIZE;
+
+end_sub:
   if(err) *err = e;
-   
   return !e;
 }
 
@@ -84,26 +82,25 @@ int tm_scale(tMat *dst, tmVal k, int* err)
 {
   int R,C,i,j, e = 0;
   tmVal *p;
+
+  TM_ASSERT_ARGS(dst, e, end_scale);
    
-  if(dst) {
-    R = dst->rows; C = dst->cols;
-    if(IS_PRIM(dst)) {
-      R *= C;
-      p = dst->data;
-      for(i = 0; i < R; i++)
-        *p++ *= k;    
-    } else {
-      for(i = 0; i < R; i++) {
-        for(j = 0; j < C; j++) {
-          *tm_at(dst,i,j) *= k;
-        }
+  R = dst->rows; C = dst->cols;
+  if(IS_PRIM(dst)) {
+    R *= C;
+    p = dst->data;
+    for(i = 0; i < R; i++)
+      *p++ *= k;    
+  } else {
+    for(i = 0; i < R; i++) {
+      for(j = 0; j < C; j++) {
+        *tm_at(dst,i,j) *= k;
       }
     }
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
+  }
    
+end_scale:
   if(err) *err = e;
-   
   return !e;
 }
 
@@ -113,34 +110,33 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
   tmSize R1,C1,C2;
   int i,j,k, e = 0;
   tmVal acc;
+
+  TM_ASSERT_ARGS(dst && a && b, e, end_mul);
    
-  if(dst && a && b) {
-    if(dst != a && dst != b) {
-      /* check matrices for product */
-      R1 = a->rows; C1 = a->cols;
-      C2 = b->cols;
-      if(C1 == b->rows) {
-        /* check destination */
-        if(tm_relevant(dst,R1,C2,err)) {  
-          /* evaluate result */
-          for(i = 0; i < R1; i++) {
-            for(j = 0; j < C2; j++) {
-              acc = 0;
-              for(k = 0; k < C1; k++) 
-                acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));            
-              *tm_at(dst,i,j) = acc;
-            }
-          } 
-        }     
-      } else 
-        e = TM_ERR_NOT_COMPAT;         
+  if(dst != a && dst != b) {
+    /* check matrices for product */
+    R1 = a->rows; C1 = a->cols;
+    C2 = b->cols;
+    if(C1 == b->rows) {
+      /* check destination */
+      if(tm_relevant(dst,R1,C2,err)) {  
+        /* evaluate result */
+        for(i = 0; i < R1; i++) {
+          for(j = 0; j < C2; j++) {
+            acc = 0;
+            for(k = 0; k < C1; k++) 
+              acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));            
+            *tm_at(dst,i,j) = acc;
+          }
+        } 
+      }     
     } else 
-      e = TM_ERR_NOT_DEF;
+      e = TM_ERR_NOT_COMPAT;         
   } else 
-    e = TM_ERR_EMPTY_ARGS;
+    e = TM_ERR_NOT_DEF;
    
+end_mul:
   if(err) *err = e;  
-   
   return !e;
 }
 
@@ -251,23 +247,23 @@ tmVal tm_det(tMat *m, int *err)
   int e = 0, n, j, n1, n2;
   tmVal d;   
   tMat tmp = NULL_TMATRIX; 
+
+  TM_ASSERT_ARGS(m, e, end_det);
    
-  if(m) {
-    if(m->rows == m->cols) {
-      n = m->rows;
-      tmp = tm_copy(m,&e);                 
-      if(!e) ludcmp(&tmp,NULL,&d,&e);
-      if(!e) {
-        n1 = n+1; n2 = n*n;
-        /* product of diagonal elements */
-        for(j = 0; j < n2; j += n1)
-          d *= tmp.data[j];
-      }                
-    } else 
-      e = TM_ERR_NOT_DEF;
+  if(m->rows == m->cols) {
+    n = m->rows;
+    tmp = tm_copy(m,&e);                 
+    if(!e) ludcmp(&tmp,NULL,&d,&e);
+    if(!e) {
+      n1 = n+1; n2 = n*n;
+      /* product of diagonal elements */
+      for(j = 0; j < n2; j += n1)
+        d *= tmp.data[j];
+    }                
   } else 
-    e = TM_ERR_EMPTY_ARGS;
+    e = TM_ERR_NOT_DEF;
       
+end_det:
   if(err) *err = e;  
   tm_clear(&tmp);
    
@@ -282,7 +278,8 @@ tMat tm_inv(tMat *m, int *err)
   tMat tmp = NULL_TMATRIX, res = NULL_TMATRIX, 
        col;
    
-  if(m) {
+  TM_ASSERT_ARGS(m, e, end_inv);
+
     if(m->rows == m->cols) {
       n = m->rows;
       tmp = tm_copy(m,&e);
@@ -303,14 +300,12 @@ tMat tm_inv(tMat *m, int *err)
       }
     } else 
       e = TM_ERR_NOT_DEF;
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
   
+end_inv:
   if(n > MEM_TMP_VEC) free(idx);
   tm_clear(&tmp);
    
   if(err) *err = e;
-     
   return res;
 }
 
@@ -320,37 +315,35 @@ tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
   tmVal tol = PINV_TOL_MAX, v;
   tMat A = NULL_TMATRIX, st;
    
-  if(src) {
-    *transp = 0;
-    m = src->rows; n = src->cols;
-    st = tm_T(src,&e); 		if(e) goto end_pinva;
-    if(m < n) {
-      /* transpose */
-      *transp = 1;
-      n = m;
-      A = tm_new(n,n,&e); 	if(e) goto end_pinva;
-      tm_mul(&A,src,&st,&e); 	if(e) goto end_pinva;        
-    } else {
-      /* original */
-      A = tm_new(n,n,&e); 	if(e) goto end_pinva;
-      tm_mul(&A,&st,src,&e); 	if(e) goto end_pinva;
-    }
-    /* tolerance */
-    m = n+1; n *= n; 
-    for(i = 0; i < n; i += m) {
-      v = A.data[i];
-      if(v <= 0) 
-        v = PINV_TOL_MAX;
-      tol = (tol < v) ? tol : v;
-    }
-    tol *= PINV_TOL;    
-  } else
-    e = TM_ERR_EMPTY_ARGS;
+  TM_ASSERT_ARGS(src, e, end_pinva);
+
+  *transp = 0;
+  m = src->rows; n = src->cols;
+  st = tm_T(src,&e); 		if(e) goto end_pinva;
+  if(m < n) {
+    /* transpose */
+    *transp = 1;
+    n = m;
+    A = tm_new(n,n,&e); 	if(e) goto end_pinva;
+    tm_mul(&A,src,&st,&e); 	if(e) goto end_pinva;        
+  } else {
+    /* original */
+    A = tm_new(n,n,&e); 	if(e) goto end_pinva;
+    tm_mul(&A,&st,src,&e); 	if(e) goto end_pinva;
+  }
+  /* tolerance */
+  m = n+1; n *= n; 
+  for(i = 0; i < n; i += m) {
+    v = A.data[i];
+    if(v <= 0) 
+      v = PINV_TOL_MAX;
+    tol = (tol < v) ? tol : v;
+  }
+  tol *= PINV_TOL;    
 
 end_pinva:    
   *err = e;
   *tolerance = tol;
-  
   return A;
 }
 
@@ -468,51 +461,50 @@ int tm_rank(tMat* m, int* err)
   tMat cp = NULL_TMATRIX, tmp; 
   tmVal k, *swp, **ptr = NULL, *arr[MEM_TMP_VEC];
 
-  if(m) {
-    /* make copy for modification */
-    if(m->rows > m->cols) {
-      tmp = tm_T(m,&e); 
-      if(!e) cp = tm_copy(&tmp,&e);
-    } else 
-      cp = tm_copy(m,&e);
-    if(!e) {
-      /* use pointers to rows instead of copying elements */
-      R = cp.rows; C = cp.cols;
-      ptr = (R <= MEM_TMP_VEC) ? arr : (tmVal**) malloc(sizeof(tmVal*) * R);
-      if(!ptr) {
-        if(err) *err = TM_ERR_NO_MEMORY;
-	return 0;
-      }
-      /* initialize rows pointers */
-      ptr[0] = cp.data;
-      for(i = 1; i < R; i++) ptr[i] = ptr[i-1] + C;
-      /* triangulate */
-      for(i = 0; i < R; i++) {
-	/* looking for nonzero elements */
-	for(j = i+1; j < R && ptr[i][i] == 0; j++) {
-	  if(ptr[j][i] != 0) {
-	    swp = ptr[j]; ptr[j] = ptr[i]; ptr[i] = swp;
-	  }
-	}
-	k = ptr[i][i];
-	if(k != 0) {
-	  /* normalize to k */
-	  for(j = i; j < C; j++) ptr[i][j] /= k;
-	  /* subtract */
-	  for(q = i+1; q < R; q++) {
-	    k = ptr[q][i];
-	    for(j = i; j < C; j++) ptr[q][j] -= k * ptr[i][j];
-	  }
-	  res++;  /* increase rank counter */
-	} else 
-	  break;
-      }
-    }
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
+  TM_ASSERT_ARGS(m, e, end_rank);
 
+    /* make copy for modification */
+  if(m->rows > m->cols) {
+    tmp = tm_T(m,&e); 
+    if(!e) cp = tm_copy(&tmp,&e);
+  } else 
+    cp = tm_copy(m,&e);
+  if(!e) {
+    /* use pointers to rows instead of copying elements */
+    R = cp.rows; C = cp.cols;
+    ptr = (R <= MEM_TMP_VEC) ? arr : (tmVal**) malloc(sizeof(tmVal*) * R);
+    if(!ptr) {
+      if(err) *err = TM_ERR_NO_MEMORY;
+      return 0;
+    }
+    /* initialize rows pointers */
+    ptr[0] = cp.data;
+    for(i = 1; i < R; i++) ptr[i] = ptr[i-1] + C;
+    /* triangulate */
+    for(i = 0; i < R; i++) {
+      /* looking for nonzero elements */
+      for(j = i+1; j < R && ptr[i][i] == 0; j++) {
+        if(ptr[j][i] != 0) {
+          swp = ptr[j]; ptr[j] = ptr[i]; ptr[i] = swp;
+        }
+      }
+      k = ptr[i][i];
+      if(k != 0) {
+        /* normalize to k */
+        for(j = i; j < C; j++) ptr[i][j] /= k;
+          /* subtract */
+          for(q = i+1; q < R; q++) {
+            k = ptr[q][i];
+            for(j = i; j < C; j++) ptr[q][j] -= k * ptr[i][j];
+          }
+          res++;  /* increase rank counter */
+      } else 
+        break;
+    }
+  }
+
+end_rank:
   if(err) *err = e;
-  
   tm_clear(&cp);
   if(R > MEM_TMP_VEC) free(ptr);
 

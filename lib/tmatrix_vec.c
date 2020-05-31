@@ -26,24 +26,24 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
   int e = 0;
   tmVal res = 0;
 
-  if(m) {
-    if(m->cols == 1) {
-      /* column vector */
-      if(k < m->rows)
-        res = *tm_at(m,k,0);
-      else 
-        e = TM_ERR_WRONG_SIZE;      
-    } else if(m->rows == 1) {
-      /* row vector */
-      if(k < m->cols)
-        res = *tm_at(m,0,k);
-      else 
-        e = TM_ERR_WRONG_SIZE;      
-    } else 
-      e = TM_ERR_NOT_VEC;
+  TM_ASSERT_ARGS(m, e, end_get);
+
+  if(m->cols == 1) {
+    /* column vector */
+    if(k < m->rows)
+      res = *tm_at(m,k,0);
+    else 
+      e = TM_ERR_WRONG_SIZE;      
+  } else if(m->rows == 1) {
+    /* row vector */
+    if(k < m->cols)
+      res = *tm_at(m,0,k);
+    else 
+      e = TM_ERR_WRONG_SIZE;      
   } else 
-    e = TM_ERR_EMPTY_ARGS;
+    e = TM_ERR_NOT_VEC;
     
+end_get:
   if(err) *err = e;
   
   return res;
@@ -52,25 +52,25 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
 void vec_set(tMat *m, tmSize k, tmVal v, int *err)
 {
   int e = 0;
+
+  TM_ASSERT_ARGS(m, e, end_set);
   
-  if(m) {
-    if(m->cols == 1) {
-      /* column vector */      
-      if(k < m->rows)
-        *tm_at(m,k,0) = v;
-      else 
-        e = TM_ERR_WRONG_SIZE; 
-    } else if(m->rows == 1) {
-      /* row vector */      
-      if(k < m->cols)
-        *tm_at(m,0,k) = v;
-      else 
-        e = TM_ERR_WRONG_SIZE;          
-    } else 
-      e = TM_ERR_NOT_VEC;
+  if(m->cols == 1) {
+    /* column vector */      
+    if(k < m->rows)
+      *tm_at(m,k,0) = v;
+    else 
+      e = TM_ERR_WRONG_SIZE; 
+  } else if(m->rows == 1) {
+    /* row vector */      
+    if(k < m->cols)
+      *tm_at(m,0,k) = v;
+    else 
+      e = TM_ERR_WRONG_SIZE;          
   } else 
-    e = TM_ERR_EMPTY_ARGS;
+    e = TM_ERR_NOT_VEC;
     
+end_set:
   if(err) *err = e;
 }
 
@@ -95,7 +95,6 @@ tmVal vec_dot(tMat *a, tMat *b, int *err)
     e = TM_ERR_NOT_VEC;
   
   if(err) *err = e;
-  
   return sum;
 }
 
@@ -103,23 +102,22 @@ int vec_cross(tMat *res, tMat *a, tMat *b, int *err)
 {
   int e = 0;
   tmVal a0,a1,a2,b0,b1,b2;  
+
+  TM_ASSERT_ARGS(res && a && b, e, end_cross);
   
-  if(res && a && b) {
-    if(vec_len(a) == 3 && vec_len(b) == 3) {
-      if(tm_relevant(res,3,1,&e) || (e == TM_ERR_NOT_MAIN && tm_relevant(res,1,3,&e))) { 
-        a0 = vec_get(a,0,0); a1 = vec_get(a,1,0); a2 = vec_get(a,2,0);
-        b0 = vec_get(b,0,0); b1 = vec_get(b,1,0); b2 = vec_get(b,2,0);
-        vec_set(res,0, a1*b2 - b1*a2, 0);
-        vec_set(res,1, a2*b0 - a0*b2, 0);
-        vec_set(res,2, a0*b1 - b0*a1, 0); 
-      }     
-    } else
-      e = TM_ERR_NOT_DEF;
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
+  if(vec_len(a) == 3 && vec_len(b) == 3) {
+    if(tm_relevant(res,3,1,&e) || (e == TM_ERR_NOT_MAIN && tm_relevant(res,1,3,&e))) { 
+      a0 = vec_get(a,0,0); a1 = vec_get(a,1,0); a2 = vec_get(a,2,0);
+      b0 = vec_get(b,0,0); b1 = vec_get(b,1,0); b2 = vec_get(b,2,0);
+      vec_set(res,0, a1*b2 - b1*a2, 0);
+      vec_set(res,1, a2*b0 - a0*b2, 0);
+      vec_set(res,2, a0*b1 - b0*a1, 0); 
+    }     
+  } else
+    e = TM_ERR_NOT_DEF;
     
+end_cross:
   if(err) *err = e;
-  
   return !e;  
 }
 
@@ -127,27 +125,26 @@ tmVal vec_norm2(tMat *m, int *err)
 {
   int e = 0, i;
   tmVal sum = 0, v;
+
+  TM_ASSERT_ARGS(m, e, end_norm2);
   
-  if(m) {
-    if(m->cols == 1) {
-      /* column vector */
-      for(i = 0; i < m->rows; i++) {
-        v = *tm_at(m,i,0);
-        sum += v * v;
-      }
-    } else if(m->rows == 1) {
-      /* row vector */
-      for(i = 0; i < m->cols; i++) {
-        v = *tm_at(m,0,i);
-        sum += v * v;
-      }
-    } else 
-      e = TM_ERR_NOT_VEC;
+  if(m->cols == 1) {
+    /* column vector */
+    for(i = 0; i < m->rows; i++) {
+      v = *tm_at(m,i,0);
+      sum += v * v;
+    }
+  } else if(m->rows == 1) {
+    /* row vector */
+    for(i = 0; i < m->cols; i++) {
+      v = *tm_at(m,0,i);
+      sum += v * v;
+    }
   } else 
-    e = TM_ERR_EMPTY_ARGS;
+    e = TM_ERR_NOT_VEC;
     
+end_norm2:
   if(err) *err = e;
-  
   return sum;
 }
 
@@ -155,8 +152,9 @@ int vec_normalize(tMat *m, int *err)
 {
   int e = 0, i;
   tmVal sum = 0, v;
+
+  TM_ASSERT_ARGS(m, e, end_normalize);
   
-  if(m) {    
     if(m->cols == 1) {
       /* column vector */
       for(i = 0; i < m->rows; i++) {
@@ -181,11 +179,9 @@ int vec_normalize(tMat *m, int *err)
       }
     } else 
       e = TM_ERR_NOT_VEC;    
-  } else 
-    e = TM_ERR_EMPTY_ARGS;
-    
+
+end_normalize:
   if(err) *err = e;
-  
   return !e;
 }
 
