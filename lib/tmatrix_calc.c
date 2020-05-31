@@ -23,23 +23,22 @@ int tm_add(tMat *dst, tMat* m, int* err)
   TM_ASSERT_ARGS(dst && m, e, end_add);
    
   R = m->rows; C = m->cols;         
-  if(dst->rows == R && dst->cols == C) {
-    /* equal */
-    if(IS_PRIM(dst) && IS_PRIM(m)) {
-      /* just add element-wise */
-      R *= C;    /* reuse variable */
-      p1 = dst->data; p2 = m->data;
-      for(i = 0; i < R; i++)  
-        *p1++ += *p2++;                       
-    } else {
-      /* use method 'at' */        
-      for(i = 0; i < R; i++) {
-        for(j = 0; j < C; j++) 
-          *tm_at(dst,i,j) += *tm_at(m,i,j);	          
-      }
-    }           
-  } else 
-    e = TM_ERR_WRONG_SIZE;                  
+  TM_ASSERT_INDEX(dst->rows == R && dst->cols == C, e, end_add);
+
+  /* equal */
+  if(IS_PRIM(dst) && IS_PRIM(m)) {
+    /* just add element-wise */
+    R *= C;    /* reuse variable */
+    p1 = dst->data; p2 = m->data;
+    for(i = 0; i < R; i++)  
+      *p1++ += *p2++;                       
+  } else {
+    /* use method 'at' */        
+    for(i = 0; i < R; i++) {
+      for(j = 0; j < C; j++) 
+        *tm_at(dst,i,j) += *tm_at(m,i,j);	          
+    }
+  }           
            
 end_add:
   if(err) *err = e;
@@ -54,24 +53,23 @@ int tm_sub(tMat *dst, tMat* m, int* err)
   TM_ASSERT_ARGS(dst && m, e, end_sub);
    
   R = m->rows; C = m->cols;
-  if(dst->rows == R && dst->cols == C) {
-    /* equal */
+  TM_ASSERT_INDEX(dst->rows == R && dst->cols == C, e, end_sub);
+
+  /* equal */
+  p1 = dst->data; p2 = m->data;
+  if(IS_PRIM(dst) && IS_PRIM(m)) {
+    /* element-wise */
+    R *= C;
     p1 = dst->data; p2 = m->data;
-    if(IS_PRIM(dst) && IS_PRIM(m)) {
-      /* element-wise */
-      R *= C;
-      p1 = dst->data; p2 = m->data;
-      for(i = 0; i < R; i++) 
-        *p1++ -= *p2++;              
-    } else {
-      /* use method 'at' */
-      for(i = 0; i < R; i++) {
-        for(j = 0; j < C; j++) 
-          *tm_at(dst,i,j) -= *tm_at(m,i,j);	          
-      }
-    }           
-  } else 
-    e = TM_ERR_WRONG_SIZE;
+    for(i = 0; i < R; i++) 
+      *p1++ -= *p2++;              
+  } else {
+    /* use method 'at' */
+    for(i = 0; i < R; i++) {
+      for(j = 0; j < C; j++) 
+        *tm_at(dst,i,j) -= *tm_at(m,i,j);	          
+    }
+  }           
 
 end_sub:
   if(err) *err = e;
@@ -280,26 +278,26 @@ tMat tm_inv(tMat *m, int *err)
    
   TM_ASSERT_ARGS(m, e, end_inv);
 
-    if(m->rows == m->cols) {
-      n = m->rows;
-      tmp = tm_copy(m,&e);
-      if(!e) res = tm_eye(n,n,&e);         
-      if(!e) {        
-        idx = (n <= MEM_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));        
-        if(idx) {
-          ludcmp(&tmp,idx,&d,&e);
-          if(!e) {
-            for(j = 0; j < n; j++) {
-              col = tm_block(&res,0,j,n,1,&e);
-              if(e) break;                     
-              lubksb(&tmp,idx,&col);
-            }
+  if(m->rows == m->cols) {
+    n = m->rows;
+    tmp = tm_copy(m,&e);
+    if(!e) res = tm_eye(n,n,&e);         
+    if(!e) {        
+      idx = (n <= MEM_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));        
+      if(idx) {
+        ludcmp(&tmp,idx,&d,&e);
+        if(!e) {
+          for(j = 0; j < n; j++) {
+            col = tm_block(&res,0,j,n,1,&e);
+            if(e) break;                     
+            lubksb(&tmp,idx,&col);
           }
-        } else 
-          e = TM_ERR_NO_MEMORY;            
-      }
-    } else 
-      e = TM_ERR_NOT_DEF;
+        }
+      } else 
+        e = TM_ERR_NO_MEMORY;            
+    }
+  } else 
+    e = TM_ERR_NOT_DEF;
   
 end_inv:
   if(n > MEM_TMP_VEC) free(idx);

@@ -18,6 +18,7 @@
  * Comment it to disable checking.
  */
 #define TM_CHECK_ARGS             /**< Check correctness of the function arguments */
+#define TM_CHECK_INDEX            /**< Check correctness of the indeces */
 
 /** 
  * @brief Constants.

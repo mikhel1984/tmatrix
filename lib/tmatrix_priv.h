@@ -47,6 +47,12 @@ enum TM_ERR {
 #define TM_ASSERT_ARGS(cond,var,lbl)  ((void)0)
 #endif
 
+#ifdef TM_CHECK_INDEX
+#define TM_ASSERT_INDEX(cond,var,lbl) if(!(cond)) {var = TM_ERR_WRONG_SIZE; goto lbl;}
+#else
+#define TM_ASSERT_INDEX(cond,var,lbl)  ((void)0)
+#endif
+
 /**
  * @brief Fast memory access without additional checking.
  * @param m matrix object.

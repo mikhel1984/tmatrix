@@ -30,16 +30,12 @@ tmVal vec_get(tMat *m, tmSize k, int *err)
 
   if(m->cols == 1) {
     /* column vector */
-    if(k < m->rows)
-      res = *tm_at(m,k,0);
-    else 
-      e = TM_ERR_WRONG_SIZE;      
+    TM_ASSERT_INDEX(k < m->rows, e, end_get);
+    res = *tm_at(m,k,0);
   } else if(m->rows == 1) {
     /* row vector */
-    if(k < m->cols)
-      res = *tm_at(m,0,k);
-    else 
-      e = TM_ERR_WRONG_SIZE;      
+    TM_ASSERT_INDEX(k < m->cols, e, end_get);
+    res = *tm_at(m,0,k);
   } else 
     e = TM_ERR_NOT_VEC;
     
@@ -57,16 +53,12 @@ void vec_set(tMat *m, tmSize k, tmVal v, int *err)
   
   if(m->cols == 1) {
     /* column vector */      
-    if(k < m->rows)
-      *tm_at(m,k,0) = v;
-    else 
-      e = TM_ERR_WRONG_SIZE; 
+    TM_ASSERT_INDEX(k < m->rows, e, end_set);
+    *tm_at(m,k,0) = v;
   } else if(m->rows == 1) {
     /* row vector */      
-    if(k < m->cols)
-      *tm_at(m,0,k) = v;
-    else 
-      e = TM_ERR_WRONG_SIZE;          
+    TM_ASSERT_INDEX(k < m->cols, e, end_set);
+    *tm_at(m,0,k) = v;
   } else 
     e = TM_ERR_NOT_VEC;
     
@@ -155,30 +147,30 @@ int vec_normalize(tMat *m, int *err)
 
   TM_ASSERT_ARGS(m, e, end_normalize);
   
-    if(m->cols == 1) {
-      /* column vector */
-      for(i = 0; i < m->rows; i++) {
-        v = *tm_at(m,i,0);
-        sum += v * v;
-      }      
-      if(sum > 0) {
-        sum = sqrt(sum);
-        for(i = 0; i < m->rows; i++) 
-          *tm_at(m,i,0) /= sum;
-      }
-    } else if(m->rows == 1) {
-      /* row vector */
-      for(i = 0; i < m->cols; i++) {
-        v = *tm_at(m,0,i);
-        sum += v * v;
-      }      
-      if(sum > 0) {
-        sum = sqrt(sum);
-        for(i = 0; i < m->cols; i++) 
-          *tm_at(m,0,i) /= sum;
-      }
-    } else 
-      e = TM_ERR_NOT_VEC;    
+  if(m->cols == 1) {
+    /* column vector */
+    for(i = 0; i < m->rows; i++) {
+      v = *tm_at(m,i,0);
+      sum += v * v;
+    }      
+    if(sum > 0) {
+      sum = sqrt(sum);
+      for(i = 0; i < m->rows; i++) 
+        *tm_at(m,i,0) /= sum;
+    }
+  } else if(m->rows == 1) {
+    /* row vector */
+    for(i = 0; i < m->cols; i++) {
+      v = *tm_at(m,0,i);
+      sum += v * v;
+    }      
+    if(sum > 0) {
+      sum = sqrt(sum);
+      for(i = 0; i < m->cols; i++) 
+        *tm_at(m,0,i) /= sum;
+    }
+  } else 
+    e = TM_ERR_NOT_VEC;    
 
 end_normalize:
   if(err) *err = e;

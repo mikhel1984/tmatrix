@@ -41,7 +41,6 @@ int tm_relevant(tMat* m, tmSize R, tmSize C, int* err)
   }
   
   if(err) *err = e;
-  
   return !e;
 }
 
@@ -64,7 +63,6 @@ tMat tm_new(tmSize r, tmSize c, int* err)
     e = TM_ERR_WRONG_SIZE;
 
   if(err) *err = e;
-
   return res;
 }
 
@@ -80,7 +78,6 @@ tMat tm_eye(tmSize r, tmSize c, int *err)
   }
    
   if(err) *err = e;
-   
   return res;
 }
 
@@ -91,14 +88,12 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
   int e = 0;
   
   TM_ASSERT_ARGS(dat, e, end_static);
+  TM_ASSERT_INDEX(r && c, e, end_static);
    
-  if(r && c) {
-    res.data = dat;
-    res.rows = r;
-    res.width = res.cols = c;
-    res.type = TM_STATIC;      
-  } else 
-    e = TM_ERR_WRONG_SIZE;
+  res.data = dat;
+  res.rows = r;
+  res.width = res.cols = c;
+  res.type = TM_STATIC;      
    
 end_static:
   if(err) *err = e;
@@ -123,11 +118,9 @@ tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err)
   tmVal res = 0;
   
   TM_ASSERT_ARGS(m, e, end_get);
+  TM_ASSERT_INDEX(r < m->rows && c < m->cols, e, end_get);
 
-  if(r < m->rows && c < m->cols)
-    res = *tm_at(m,r,c);
-  else 
-    e = TM_ERR_WRONG_SIZE;     
+  res = *tm_at(m,r,c);
       
 end_get:
   if(err) *err = e;
@@ -140,11 +133,9 @@ void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err)
   int e = 0;
 
   TM_ASSERT_ARGS(m, e, end_set);
+  TM_ASSERT_INDEX(r < m->rows && c < m->cols, e, end_set);
    
-  if(r < m->rows && c < m->cols) 
-    *tm_at(m,r,c) = v;
-  else 
-    e = TM_ERR_WRONG_SIZE;    
+  *tm_at(m,r,c) = v;
    
 end_set:
   if(err) *err = e;  
@@ -175,25 +166,24 @@ tMat tm_copy(tMat* src, int* err)
   res.cols = src->cols;
   res.width = res.cols;
   j = res.rows*res.cols;
-  if(j) {
-    data = (tmVal*) malloc(j * sizeof(tmVal));
-    if(data) {
-      res.data = data;
-      res.type = TM_MAIN;        
-      if(IS_PRIM(src)) {
-        p = src->data;
-        for(i = 0; i < j; i++) 
-          *data++ = *p++;               
-      } else {
-        for(i = 0; i < res.rows; i++) {
-          for(j = 0; j < res.cols; j++) 
-            *data++ = *tm_at(src,i,j);	          
-        }
+  TM_ASSERT_INDEX(j, e, end_copy);
+
+  data = (tmVal*) malloc(j * sizeof(tmVal));
+  if(data) {
+    res.data = data;
+    res.type = TM_MAIN;        
+    if(IS_PRIM(src)) {
+      p = src->data;
+      for(i = 0; i < j; i++) 
+        *data++ = *p++;               
+    } else {
+      for(i = 0; i < res.rows; i++) {
+        for(j = 0; j < res.cols; j++) 
+          *data++ = *tm_at(src,i,j);	          
       }
-    } else 
-      e = TM_ERR_NO_MEMORY;         
-  } else
-    e = TM_ERR_WRONG_SIZE;
+    }
+  } else 
+    e = TM_ERR_NO_MEMORY;         
       
 end_copy:
   if(err) *err = e;
@@ -262,18 +252,16 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
   int e = 0;
    
   TM_ASSERT_ARGS(src, e, end_block);
+  TM_ASSERT_INDEX(Nr > 0 && (r0+Nr) <= src->rows && Nc > 0 && (c0+Nc) <= src->cols, e, end_block);
 
   if(IS_PRIM(src)) {
-    if(Nr > 0 && (r0+Nr) <= src->rows && Nc > 0 && (c0+Nc) <= src->cols) {
-      res = *src;
-      res.type = TM_SUB;
-      res.rows = Nr;
-      res.cols = Nc;
-      res.data = src->data + (r0*src->width + c0);
-    } else 
-      e = TM_ERR_WRONG_SIZE;
- } else 
-   e = TM_ERR_NOT_MAIN;
+    res = *src;
+    res.type = TM_SUB;
+    res.rows = Nr;
+    res.cols = Nc;
+    res.data = src->data + (r0*src->width + c0);
+  } else 
+    e = TM_ERR_NOT_MAIN;
 
 end_block:
   if(err) *err = e;  
@@ -336,23 +324,21 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C,
   res.type = TM_MAIN;
 
   TM_ASSERT_ARGS(src && rule, e, end_make);
+  TM_ASSERT_INDEX(R && C, e, end_make);
   
-  if(R && C) {
-    data = (tmVal*) calloc(R*C, sizeof(tmVal));
-    if(data) {
-      /* initialize matrix */
-      res.data = data;
-      res.rows = R;
-      res.width = res.cols = C; 
-      /* find values */ 
-      for(i = 0; !e && i < R; i++) {
-        for(j = 0; !e && j < C; j++) 
-          *data++ = rule(src,N,i,j,&e);          
-      }   
-    } else 
-      e = TM_ERR_NO_MEMORY; 
+  data = (tmVal*) calloc(R*C, sizeof(tmVal));
+  if(data) {
+    /* initialize matrix */
+    res.data = data;
+    res.rows = R;
+    res.width = res.cols = C; 
+    /* find values */ 
+    for(i = 0; !e && i < R; i++) {
+      for(j = 0; !e && j < C; j++) 
+        *data++ = rule(src,N,i,j,&e);          
+    }   
   } else 
-    e = TM_ERR_WRONG_SIZE;
+    e = TM_ERR_NO_MEMORY; 
     
 end_make:
   if(err) *err = e;
@@ -397,39 +383,37 @@ tMat tm_concat(tMat src[], int N, int dir, int* err)
   tMat res = NULL_TMATRIX;  
 
   TM_ASSERT_ARGS(src, e, end_concat);
+  TM_ASSERT_INDEX(N > 0, e, end_concat);
   
-  if(N > 0) {
-    switch(dir) {
-    case 0: /* horizontal concatenation */
-      c = src[0].cols;
-      r = src[0].rows;
-      for(i = 1; i < N; i++) {
-        if(src[i].rows != r) {
-          e = TM_ERR_NOT_COMPAT;
-          goto end_concat;
-        }
-        c += src[i].cols;
+  switch(dir) {
+  case 0: /* horizontal concatenation */
+    c = src[0].cols;
+    r = src[0].rows;
+    for(i = 1; i < N; i++) {
+      if(src[i].rows != r) {
+        e = TM_ERR_NOT_COMPAT;
+        goto end_concat;
       }
-      res = tm_make(src,N,r,c,concath,&e);
-      break;
-    case 1: /* vertical concatenation */
-      r = src[0].rows;
-      c = src[0].cols;
-      for(i = 1; i < N; i++) {
-        if(src[i].cols != c) {
-          e = TM_ERR_NOT_COMPAT;
-          goto end_concat;
-        }
-        r += src[i].rows;
-      }
-      res = tm_make(src,N,r,c,concatv,&e);
-      break;
-    default:
-      e = TM_ERR_WRONG_SIZE;
-      break;
+      c += src[i].cols;
     }
-  } else 
-    e = TM_ERR_WRONG_SIZE;    
+    res = tm_make(src,N,r,c,concath,&e);
+    break;
+  case 1: /* vertical concatenation */
+    r = src[0].rows;
+    c = src[0].cols;
+    for(i = 1; i < N; i++) {
+      if(src[i].cols != c) {
+        e = TM_ERR_NOT_COMPAT;
+        goto end_concat;
+      }
+      r += src[i].rows;
+    }
+    res = tm_make(src,N,r,c,concatv,&e);
+    break;
+  default:
+    e = TM_ERR_WRONG_SIZE;
+    break;
+  }
 
 end_concat:
   if(err) *err = e;
