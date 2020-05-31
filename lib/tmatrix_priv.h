@@ -11,7 +11,7 @@
  * @brief Matrix types. 
  */
 #define TM_STATIC    0   /**< Matrix contains pointer to static memory. */
-#define TM_MAIN      1   /**< Matrix contains pointer to dynamic memory. */
+#define TM_ALLOC      1   /**< Matrix contains pointer to dynamic memory. */
 #define TM_TRANSPOSE 2   /**< Matrix has link to another matrix data and define transposition access. */
 #define TM_SUB       3   /**< Matrix has link to another matrix data and define sub matrix access. */
 /**
@@ -19,7 +19,7 @@
  * @param X pointer to matrix.
  * @return 1 if the matrix has static or dynamic types.
  */
-#define IS_PRIM(X) ((X)->type == TM_MAIN || (X)->type == TM_STATIC)
+#define IS_PRIM(X) ((X)->type == TM_ALLOC || (X)->type == TM_STATIC)
 
 /** 
  * @brief Error types. 

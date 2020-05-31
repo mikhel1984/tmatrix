@@ -22,7 +22,7 @@ int tm_relevant(tMat* m, tmSize R, tmSize C, int* err)
   tmVal *data;
   
   if(m->rows != R || m->cols != C) {
-    if(m->type == TM_MAIN) {
+    if(m->type == TM_ALLOC) {
       N = R * C;
       if(m->rows * m->cols < N) {
         data = (tmVal*) malloc(N * sizeof(tmVal));
@@ -49,7 +49,7 @@ tMat tm_new(tmSize r, tmSize c, int* err)
 {
   int e = 0;
   tMat res = NULL_TMATRIX;   
-  res.type = TM_MAIN;
+  res.type = TM_ALLOC;
    
   if(r && c) {
     res.data = (tmVal*) calloc(r*c, sizeof(tmVal));
@@ -58,8 +58,9 @@ tMat tm_new(tmSize r, tmSize c, int* err)
       res.width = res.cols = c;    
     } else 
       e = TM_ERR_NO_MEMORY;      
-  } else if(!r && !c) {}    /* allow empty matrix for further usage in tm_mul */
-    else 
+  } else if(!r && !c) {    
+    /* allow empty matrix for further usage in tm_mul */
+  } else 
     e = TM_ERR_WRONG_SIZE;
 
   if(err) *err = e;
@@ -103,7 +104,7 @@ end_static:
 /* Free dynamically allocated memory */
 void tm_clear(tMat* matrix) 
 {
-  if(matrix && matrix->type == TM_MAIN) {
+  if(matrix && matrix->type == TM_ALLOC) {
     free(matrix->data);
     matrix->data = NULL;
     matrix->rows = 0;
@@ -171,7 +172,7 @@ tMat tm_copy(tMat* src, int* err)
   data = (tmVal*) malloc(j * sizeof(tmVal));
   if(data) {
     res.data = data;
-    res.type = TM_MAIN;        
+    res.type = TM_ALLOC;        
     if(IS_PRIM(src)) {
       p = src->data;
       for(i = 0; i < j; i++) 
@@ -321,7 +322,7 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C,
   int e = 0,i,j;
   tmVal *data = NULL;
   tMat res = NULL_TMATRIX;  
-  res.type = TM_MAIN;
+  res.type = TM_ALLOC;
 
   TM_ASSERT_ARGS(src && rule, e, end_make);
   TM_ASSERT_INDEX(R && C, e, end_make);
