@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_homo.c
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Homogeneous transformations and specific simplifications.
  */ 
 #include <stdlib.h>

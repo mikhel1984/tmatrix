@@ -4,6 +4,7 @@
 #include <time.h>
 #include "../lib/tmatrix_homo.h"
 #include "../lib/tmatrix_vec.h"
+#include "../lib/tmatrix_print.h"
 #include "minunit.h"
 
 #define EQL(X,Y) fabs((X)-(Y)) < 1E-6

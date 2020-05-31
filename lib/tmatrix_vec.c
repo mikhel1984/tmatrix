@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_vec.c
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Vector specific operations.
  */ 
 #include <stdlib.h>

@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_vec.h
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Definitions of vector specific methods.
  *
  * Vector here is a matrix with number of rows or columns equal to 1.

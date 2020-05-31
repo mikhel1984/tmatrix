@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_priv.h
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief "Private" matrix parameters and methods.
  */
 #ifndef T_MATRIX_PRIVATE_H

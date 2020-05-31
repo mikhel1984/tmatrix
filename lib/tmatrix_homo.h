@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_homo.h
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Definition of methods for homogeneous transformations.
  *
  * Homogeneous transformations assumes manipulations with matrices 4x4. 

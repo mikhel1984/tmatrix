@@ -1,7 +1,7 @@
 /**
  * @file tmatrix_calc.c
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Arithmetic operations and transformations.
  */ 
 #include <stdlib.h>

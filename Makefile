@@ -7,7 +7,8 @@ LIBS = -lm
 .PHONY: all test
 
 # sources 
-SRC = lib/tmatrix.c lib/tmatrix_calc.c lib/tmatrix_homo.c lib/tmatrix_vec.c
+SRC = lib/tmatrix.c lib/tmatrix_calc.c lib/tmatrix_homo.c lib/tmatrix_vec.c \
+      lib/tmatrix_print.c
 MAIN = example.c $(SRC)
 TEST = tests/tests.c $(SRC)
 

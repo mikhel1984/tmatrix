@@ -1,7 +1,7 @@
 /**
  * @file tmatrix.h
  * @author Stanislav Mikhel
- * @date 2019
+ * @date 2020
  * @brief Definitions of the main structures and functions for matrices.
  * 
  * This library is written in pure C and focused on coordinate transformations
@@ -199,17 +199,6 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, tmVal (*rule)(tMat*,tmSiz
  * @note Free memory with @a tm_clear.
  */
 tMat tm_concat(tMat src[], int N, int dir, int* err);
-/** 
- * @brief Simple matrix visualization.
- * @param m matrix object. 
- */
-void tm_print(tMat *m);
-/**
- * @brief Error description.
- * @param code error value.
- * @return Description string.
- */
-const char* tm_error(int code);
 
 /*============== Arithmetic methods etc. ==============*/
 

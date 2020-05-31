@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "lib/tmatrix_homo.h"
 #include "lib/tmatrix_vec.h"
+#include "lib/tmatrix_print.h"
 
 #define JOINT_NO 6   /* number of joints */
 #define CART_NO  6   /* number of coordinates in Cartesian space */
