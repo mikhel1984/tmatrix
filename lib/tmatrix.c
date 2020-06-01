@@ -257,6 +257,17 @@ end_insert:
   return !e; 
 }
 
+/* Set all to zero */
+void tm_zeros(tMat* dst)
+{
+  int i, N;
+  tmVal* ptr;
+  if(dst && dst->data) {
+    N = dst->rows * dst->cols;
+    ptr = dst->data;
+    for(i = 0; i < N; i++) *ptr++ = 0;
+  }
+}
 
 /* Create matrix from list of matrices and some rule */
 tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, 

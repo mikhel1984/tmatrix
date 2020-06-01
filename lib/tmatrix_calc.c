@@ -117,7 +117,7 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
     C2 = b->cols;
     if(C1 == b->rows) {
       /* check destination */
-      if(tm_relevant(dst,R1,C2,err)) {  
+      if(tm_relevant(dst,R1,C2,&e)) {  
         /* evaluate result */
         for(i = 0; i < R1; i++) {
           for(j = 0; j < C2; j++) {
@@ -300,8 +300,7 @@ int tm_inv(tMat *dst, tMat *m, int *err)
         } else 
           e = TM_ERR_NO_MEMORY;
       }
-    } else 
-      e = TM_ERR_NOT_COMPAT;
+    } 
   } else 
     e = TM_ERR_NOT_DEF;
   

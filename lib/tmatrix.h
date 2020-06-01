@@ -199,6 +199,11 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, tmVal (*rule)(tMat*,tmSiz
  * @note Free memory with @a tm_clear.
  */
 tMat tm_concat(tMat src[], int N, int dir, int* err);
+/**
+ * @brief Set zero values.
+ * @param dst matrix to change.
+ */
+void tm_zeros(tMat* dst);
 
 /*============== Arithmetic methods etc. ==============*/
 
