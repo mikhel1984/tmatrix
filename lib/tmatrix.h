@@ -68,7 +68,7 @@ typedef struct tMat_ {
 /** 
  * @brief Create matrix of given size.
  *
- * Method allocate memory and initialize it with zeros. 
+ * Allocate memory and initialize it with zeros. 
  * @param r number of rows.
  * @param c number of columns.
  * @param err error code.
@@ -79,7 +79,7 @@ tMat tm_new(tmSize r, tmSize c, int* err);
 /** 
  * @brief Create matrix from static array.
  *
- * Method pointer into a matrix structure without modifications.
+ * Set pointer into a matrix structure without modifications.
  * @param r number of rows.
  * @param c number of columns.
  * @param dat data array.
@@ -91,7 +91,7 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
 /** 
  * @brief Create identity matrix.
  *
- * Method allocate memory, initialize it with zeros and sets diagonal elements
+ * Allocate memory, initialize it with zeros and sets diagonal elements
  * equal to 1.
  * @param r number of rows.
  * @param c number of columns.
@@ -257,21 +257,21 @@ tmVal tm_det(tMat *m, int *err);
  * @brief Find inverted matrix.
  * 
  * Source matrix must be equal.
+ * @param dst matrix for result.
  * @param m matrix object.
  * @param err error code.
- * @return Inverted matrix.
- * @note Free memory with @a tm_clear.
+ * @return 1 in case of success.
  */
-tMat tm_inv(tMat *m, int *err);
+int tm_inv(tMat *dst, tMat *m, int *err);
 /** 
  * @brief Find pseudo-inverted matrix.
  * 
+ * @param dst matrix for result.
  * @param m matrix object.
  * @param err error code.
- * @return Pseudo-inverted matrix.
- * @note Free memory with @a tm_clear.
+ * @return 1 in case of success.
  */
-tMat tm_pinv(tMat *m, int *err);
+int tm_pinv(tMat* dst, tMat *m, int *err);
 /**
  * @brief Find rank of the matrix.
  * @param m matrix object.

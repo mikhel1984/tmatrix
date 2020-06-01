@@ -76,7 +76,7 @@ tmVal vec_dot(tMat *a, tMat *b, int *err)
     if(N1 == i) {
       if(IS_PRIM(a) && IS_PRIM(b)) {
         for(i = 0; i < N1; i++) 
-          sum += a->data[i] * b->data[i];        
+          sum += a->data[i] * b->data[i];
       } else {
         for(i = 0; i < N1 && !e; i++)
           sum += vec_get(a,i,&e) * vec_get(b,i,&e);

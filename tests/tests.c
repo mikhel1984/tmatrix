@@ -295,7 +295,8 @@ static char* test_inv()
   mu_check("Inv (det):", err);
   mu_assert("Inv (det): wrong value", EQL(d,-76));
    
-  im = tm_inv(&m, &err);
+  im = tm_new(0,0,&err);
+  tm_inv(&im, &m, &err);
   mu_check("Inv (det):", err);
   pr = tm_simp();
   
@@ -333,7 +334,8 @@ static char* test_pinv()
   m = tm_static(2,4,a1,&err);
   mu_check("Pinv (static):", err);
    
-  im = tm_pinv(&m,&err);
+  im = tm_new(0,0, &err);
+  tm_pinv(&im, &m, &err);
   mu_check("Pinv (pinv):", err);
    
   pr = tm_simp();     
@@ -345,10 +347,9 @@ static char* test_pinv()
       mu_assert("Pinv (pinv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
   }
-  tm_clear(&im);
   
   m = tm_static(4,2,a1,NULL);
-  im = tm_pinv(&m,&err);
+  tm_pinv(&im, &m,&err);
   mu_check("Pinv (pinv):", err);
   tm_mul(&pr,&im,&m,&err);
   mu_check("Pinv (mul):", err);   

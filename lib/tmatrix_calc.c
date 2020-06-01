@@ -22,7 +22,7 @@ int tm_add(tMat *dst, tMat* m, int* err)
 
   TM_ASSERT_ARGS(dst && m, e, end_add);
    
-  R = m->rows; C = m->cols;         
+  R = m->rows; C = m->cols; 
   TM_ASSERT_INDEX(dst->rows == R && dst->cols == C, e, end_add);
 
   /* equal */
@@ -31,15 +31,15 @@ int tm_add(tMat *dst, tMat* m, int* err)
     R *= C;    /* reuse variable */
     p1 = dst->data; p2 = m->data;
     for(i = 0; i < R; i++)  
-      *p1++ += *p2++;                       
+      *p1++ += *p2++; 
   } else {
-    /* use method 'at' */        
+    /* use method 'at' */ 
     for(i = 0; i < R; i++) {
       for(j = 0; j < C; j++) 
-        *tm_at(dst,i,j) += *tm_at(m,i,j);	          
+        *tm_at(dst,i,j) += *tm_at(m,i,j);  
     }
-  }           
-           
+  }
+
 end_add:
   if(err) *err = e;
   return !e;
@@ -62,14 +62,14 @@ int tm_sub(tMat *dst, tMat* m, int* err)
     R *= C;
     p1 = dst->data; p2 = m->data;
     for(i = 0; i < R; i++) 
-      *p1++ -= *p2++;              
+      *p1++ -= *p2++;
   } else {
     /* use method 'at' */
     for(i = 0; i < R; i++) {
       for(j = 0; j < C; j++) 
-        *tm_at(dst,i,j) -= *tm_at(m,i,j);	          
+        *tm_at(dst,i,j) -= *tm_at(m,i,j);
     }
-  }           
+  }
 
 end_sub:
   if(err) *err = e;
@@ -123,13 +123,13 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
           for(j = 0; j < C2; j++) {
             acc = 0;
             for(k = 0; k < C1; k++) 
-              acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));            
+              acc += (*tm_at(a,i,k)) * (*tm_at(b,k,j));
             *tm_at(dst,i,j) = acc;
           }
         } 
       }     
     } else 
-      e = TM_ERR_NOT_COMPAT;         
+      e = TM_ERR_NOT_COMPAT;
   } else 
     e = TM_ERR_NOT_DEF;
    
@@ -165,7 +165,7 @@ void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
       if(err) *err = TM_ERR_NO_SOLUTN;
       goto end_ludcmp;
     }
-    vv[i] = 1.0/big;     
+    vv[i] = 1.0/big;
   }
   /* evaluate solution */
   for(j = 0; j < n; j++) {
@@ -204,7 +204,7 @@ void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
     if(j != n-1) {
       dum = 1.0 / dst->data[j*n + j];
       for(i = j+1; i < n; i++) 
-        dst->data[i*n+j] *= dum;         
+        dst->data[i*n+j] *= dum;
     }
   }  
 
@@ -221,15 +221,15 @@ void lubksb(tMat *src, int indx[], tMat *b)
   for(i = 0; i < n; i++) {
     ip = indx[i];
     sum = *tm_at(b,ip,0);
-    *tm_at(b,ip,0) = *tm_at(b,i,0);      
+    *tm_at(b,ip,0) = *tm_at(b,i,0);
     if(ii > -1) {
       irow = src->data + i*n;
       for(j = ii; j < i; j++) 
         sum -= irow[j] * (*tm_at(b,j,0)); 
     } else if(sum) {
-      ii = i;         
+      ii = i;
     }
-    *tm_at(b,i,0) = sum;      
+    *tm_at(b,i,0) = sum;
   }
   for(i = n-1; i >= 0; i--) {
     sum = *tm_at(b,i,0);
@@ -250,52 +250,58 @@ tmVal tm_det(tMat *m, int *err)
    
   if(m->rows == m->cols) {
     n = m->rows;
-    tmp = tm_copy(m,&e);                 
+    tmp = tm_copy(m,&e);
     if(!e) ludcmp(&tmp,NULL,&d,&e);
     if(!e) {
       n1 = n+1; n2 = n*n;
       /* product of diagonal elements */
       for(j = 0; j < n2; j += n1)
         d *= tmp.data[j];
-    }                
+    }
   } else 
     e = TM_ERR_NOT_DEF;
       
 end_det:
-  if(err) *err = e;  
+  if(err) *err = e;
   tm_clear(&tmp);
    
   return d;
 }
 
-tMat tm_inv(tMat *m, int *err)
+
+int tm_inv(tMat *dst, tMat *m, int *err)
 {
-  int e = 0, n = 0, *idx = NULL, j;
+  int e = 0, n = 0, *idx = NULL, i, j;
   int arr[MEM_TMP_VEC] = {0};
   tmVal d;
-  tMat tmp = NULL_TMATRIX, res = NULL_TMATRIX, 
-       col;
+  tMat tmp = NULL_TMATRIX, col;
    
-  TM_ASSERT_ARGS(m, e, end_inv);
+  TM_ASSERT_ARGS(m && dst && m != dst, e, end_inv);
 
   if(m->rows == m->cols) {
     n = m->rows;
-    tmp = tm_copy(m,&e);
-    if(!e) res = tm_eye(n,n,&e);         
-    if(!e) {        
-      idx = (n <= MEM_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));        
-      if(idx) {
-        ludcmp(&tmp,idx,&d,&e);
-        if(!e) {
-          for(j = 0; j < n; j++) {
-            col = tm_block(&res,0,j,n,1,&e);
-            if(e) break;                     
-            lubksb(&tmp,idx,&col);
+    if(tm_relevant(dst,n,n,&e)) {
+      /* make identity matrix */
+      for(i = 0; i < n; i++) {
+        for(j = 0; j < n; j++) 
+          *tm_at(dst,i,j) = (i == j) ? 1 : 0;
+      }
+      tmp = tm_copy(m,&e);
+      if(!e) {
+        idx = (n <= MEM_TMP_VEC) ? arr : (int*) malloc(n * sizeof(int));
+        if(idx) {
+          ludcmp(&tmp,idx,&d,&e);
+          if(!e) {
+            for(j = 0; j < n; j++) {
+              col = tm_block(dst,0,j,n,1,&e);   if(e) break;
+              lubksb(&tmp,idx,&col);
+            }
           }
-        }
-      } else 
-        e = TM_ERR_NO_MEMORY;            
-    }
+        } else 
+          e = TM_ERR_NO_MEMORY;
+      }
+    } else 
+      e = TM_ERR_NOT_COMPAT;
   } else 
     e = TM_ERR_NOT_DEF;
   
@@ -304,7 +310,7 @@ end_inv:
   tm_clear(&tmp);
    
   if(err) *err = e;
-  return res;
+  return !e;
 }
 
 tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
@@ -323,7 +329,7 @@ tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
     *transp = 1;
     n = m;
     A = tm_new(n,n,&e); 	if(e) goto end_pinva;
-    tm_mul(&A,src,&st,&e); 	if(e) goto end_pinva;        
+    tm_mul(&A,src,&st,&e); 	if(e) goto end_pinva;
   } else {
     /* original */
     A = tm_new(n,n,&e); 	if(e) goto end_pinva;
@@ -337,9 +343,9 @@ tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
       v = PINV_TOL_MAX;
     tol = (tol < v) ? tol : v;
   }
-  tol *= PINV_TOL;    
+  tol *= PINV_TOL;
 
-end_pinva:    
+end_pinva:
   *err = e;
   *tolerance = tol;
   return A;
@@ -375,7 +381,7 @@ tMat pinvl(tMat *A, tmVal tol, int *rr, int *err)
       tm_insert(&tmp1, &blk, &e); 		if(e) goto end_pinvl;
       tmp1.rows = r-1; tmp1.cols = 1;    /* "transpose */
       blk = tm_block(&L, k,0,n-k,r-1, &e); 	if(e) goto end_pinvl;
-      if(!(tm_mul(&tmp2,&blk,&tmp1,&e) && tm_sub(&B,&tmp2,&e))) goto end_pinvl;       
+      if(!(tm_mul(&tmp2,&blk,&tmp1,&e) && tm_sub(&B,&tmp2,&e))) goto end_pinvl;
     }
     
     blk = tm_block(&L, k,r-1,n-k,1, &e); 	if(e) goto end_pinvl;
@@ -407,11 +413,11 @@ end_pinvl:
   return L;  
 }
 
-tMat tm_pinv(tMat *src, int *err)
+int tm_pinv(tMat* dst, tMat *src, int *err)
 {
   int e = 0, transp = 0, r, n;
   tmVal tol = 0;
-  tMat A = NULL_TMATRIX, L = NULL_TMATRIX, prod1 = NULL_TMATRIX,
+  tMat A = NULL_TMATRIX, L = NULL_TMATRIX, 
        LL = NULL_TMATRIX, M = NULL_TMATRIX, prod2 = NULL_TMATRIX,
        blk, Lt;
   /* main matrices */
@@ -424,21 +430,21 @@ tMat tm_pinv(tMat *src, int *err)
   LL = tm_copy(&blk,&e); 		if(e) goto end_pinv;
   Lt = tm_T(&LL,&e); 			if(e) goto end_pinv;
     
-  prod1 = tm_new(r,r,&e); 		if(e) goto end_pinv; 
-  tm_mul(&prod1, &Lt, &LL, &e); 	if(e) goto end_pinv;
-  M = tm_inv(&prod1, &e); 		if(e) goto end_pinv;
+  tm_mul(dst, &Lt, &LL, &e);     	if(e) goto end_pinv;
+  M = tm_new(0,0, &e);
+  tm_inv(&M, dst, &e);   		if(e) goto end_pinv;
   blk = tm_T(src,&e); 			if(e) goto end_pinv;
     
   /* find pseudo inverse*/
   prod2 = tm_simp();
   if(transp) {
     /* blk*LL*M*M*Lt  */
-    if(!(tm_mul(&prod2,&blk,&LL,&e)    && tm_mul(&prod1,&prod2,&M,&e) &&
-         tm_mul(&prod2,&prod1,&M,&e)  && tm_mul(&prod1,&prod2,&Lt,&e))) { goto end_pinv; }
+    if(!(tm_mul(&prod2,&blk,&LL,&e)    && tm_mul(dst,&prod2,&M,&e) &&
+         tm_mul(&prod2,dst,&M,&e)  && tm_mul(dst,&prod2,&Lt,&e))) { goto end_pinv; }
   } else {
     /* LL*M*M*Lt*blk */
-    if(!(tm_mul(&prod2,&LL,&M,&e)     && tm_mul(&prod1,&prod2,&M,&e) &&
-         tm_mul(&prod2,&prod1,&Lt,&e) && tm_mul(&prod1,&prod2,&blk,&e))) { goto end_pinv; }
+    if(!(tm_mul(&prod2,&LL,&M,&e)     && tm_mul(dst,&prod2,&M,&e) &&
+         tm_mul(&prod2,dst,&Lt,&e) && tm_mul(dst,&prod2,&blk,&e))) { goto end_pinv; }
   } 
   
 end_pinv:
@@ -449,8 +455,7 @@ end_pinv:
   tm_clear(&prod2);
   
   if(err) *err = e; 
-  
-  return prod1;
+  return !e;
 }
 
 int tm_rank(tMat* m, int* err)
