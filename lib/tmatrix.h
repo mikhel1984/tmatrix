@@ -91,15 +91,13 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
 /** 
  * @brief Create identity matrix.
  *
- * Allocate memory, initialize it with zeros and sets diagonal elements
+ * Initialize matrix with zeros and sets diagonal elements
  * equal to 1.
- * @param r number of rows.
- * @param c number of columns.
+ * @param m matrix object.
  * @param err error code.
- * @return New matrix. 
- * @note Free memory with @a tm_clear.
+ * @return Identity matrix.
  */
-tMat tm_eye(tmSize r, tmSize c, int *err);
+int tm_eye(tMat* m, int *err);
 /** 
  * @brief Clear allocated memory (if need).
  * @param m pointer to matrix.

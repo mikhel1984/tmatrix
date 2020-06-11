@@ -66,20 +66,6 @@ tMat tm_new(tmSize r, tmSize c, int* err)
   return res;
 }
 
-/* New identity matrix */
-tMat tm_eye(tmSize r, tmSize c, int *err)
-{
-  int e = 0, n1 = c+1, n2 = r*c, i;
-  tMat res = tm_new(r,c,&e);
-   
-  if(!e) {
-    for(i = 0; i < n2; i += n1)
-      res.data[i] = 1;
-  }
-   
-  if(err) *err = e;
-  return res;
-}
 
 /* Matrix with static preallocated memory */
 tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
@@ -233,6 +219,22 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
 end_block:
   if(err) *err = e;  
   return res;
+}
+
+/* Convert to identity matrix */
+int tm_eye(tMat *dst, int *err)
+{
+  int i, j, e = 0;
+  TM_ASSERT_ARGS(dst, e, end_eye);
+
+  for(i = 0; i < dst->rows; i++) {
+    for(j = 0; j < dst->cols; j++) 
+      *tm_at(dst,i,j) = (i == j) ? 1 : 0;
+  }
+
+end_eye:
+  if(err) *err = e;
+  return !e;
 }
 
 /* Copy values from one matrix to another */
