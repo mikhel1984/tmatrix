@@ -1,11 +1,11 @@
 /**
- * @file tmatrix_print.h
+ * @file tmatrix_io.h
  * @author Stanislav Mikhel
  * @date 2020
- * @brief Functions for printing results.
+ * @brief Functions for data input and output.
  */
-#ifndef T_MATRIX_PRINT_H
-#define T_MATRIX_PRINT_H 
+#ifndef T_MATRIX_IO_H
+#define T_MATRIX_IO_H 
 
 #include "tmatrix.h"
 
@@ -21,4 +21,4 @@ void tm_print(tMat *m);
  */
 const char* tm_error(int code);
 
-#endif /* T_MATRIX_PRINT_H */
+#endif /* T_MATRIX_IO_H */

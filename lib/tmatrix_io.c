@@ -5,7 +5,7 @@
  * @brief Visualization for matrices and errors
  */ 
 #include <stdio.h>
-#include "tmatrix_print.h"
+#include "tmatrix_io.h"
 #include "tmatrix_priv.h"
 
 /* Simple matrix visualization */
