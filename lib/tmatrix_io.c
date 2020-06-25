@@ -22,7 +22,7 @@ void tm_print(tMat *m)
   for(i = 0; i < R; i++) {
     printf("[ ");
     for(j = 0; j < C; j++) {
-      printf("%.3f ", *tm_at(m, i, j));
+      printf("%G ", *tm_at(m, i, j));
     }
     printf("]\n");
   }
@@ -64,4 +64,27 @@ const char* tm_error(int code)
     return "Unknown error code";
     
   return list[--code];
+}
+
+int tm_to_file(tMat* m, char* fname, char sep)
+{
+  int r, c, r1, c1; 
+  FILE* pFile = 0;
+
+  if(!m || !fname) return 0; 
+  if((pFile = fopen(fname, "w")) == 0) return 0;
+
+  r1 = m->rows-1; 
+  c1 = m->cols-1;
+  for(r = 0; r <= r1 ; r++) {
+    for(c = 0; c <= c1 ; c++) {
+      fprintf(pFile, "%G", *tm_at(m,r,c));
+      if(c != c1) fputc(sep, pFile);
+    }
+    if(r != r1) fputc('\n', pFile);
+  }
+
+  fclose(pFile);
+
+  return 1;
 }

@@ -9,6 +9,8 @@
 
 #include "tmatrix.h"
 
+#define tm_to_csv(mat,fname)    tm_to_file(mat,fname,',')
+
 /** 
  * @brief Simple matrix visualization.
  * @param m matrix object. 
@@ -20,5 +22,13 @@ void tm_print(tMat *m);
  * @return Description string.
  */
 const char* tm_error(int code);
+/**
+ * @brief Save table into file.
+ * @param m matrix to save.
+ * @param fname file name.
+ * @parem sep separator character.
+ * @return 1 in case of success.
+ */
+int tm_to_file(tMat* m, char* fname, char sep);
 
 #endif /* T_MATRIX_IO_H */

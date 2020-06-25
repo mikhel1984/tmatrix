@@ -98,7 +98,9 @@ static char* test_init()
     mu_assert("Init (copy): wrong result", EQL(cp.data[i],m2.data[i])); 
   }
   
+  tm_set(&m, 0, 0, 1e-5, &err);
   tm_print(&m);
+  tm_to_file(&m, "matrix.csv", ',');
 
   tm_clear(&m);
   tm_clear(&cp);
