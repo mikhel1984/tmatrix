@@ -5,8 +5,11 @@
  * @brief Visualization for matrices and errors
  */ 
 #include <stdio.h>
+#include <stdlib.h>
 #include "tmatrix_io.h"
 #include "tmatrix_priv.h"
+
+#define BUFF_SIZE 80
 
 /* Simple matrix visualization */
 void tm_print(tMat *m)
@@ -66,6 +69,7 @@ const char* tm_error(int code)
   return list[--code];
 }
 
+/* Matrix to file in csv-like form.*/
 int tm_to_file(tMat* m, char* fname, char sep)
 {
   int r, c, r1, c1; 
@@ -88,3 +92,52 @@ int tm_to_file(tMat* m, char* fname, char sep)
 
   return 1;
 }
+
+/* Initialize matrix from file */
+
+int tm_from_file(tMat* dst, char* fname, char sep)
+{
+  int i = 0, j = 0, c;
+  char buff[BUFF_SIZE], *pb;
+  FILE* pFile = 0;
+
+  if(!dst || !fname) return 0;
+  if((pFile = fopen(fname,"r")) == 0) return 0;
+
+  // estimate matrix size 
+  while((c = fgetc(pFile)) != EOF) {
+    if(c == sep) {
+      j++; 
+    } else if(c == '\n') {
+      i++; j = 0; 
+    }
+  }
+
+  // prepare matrix
+  if(!tm_relevant(dst,++i,++j,0)) {
+    fclose(pFile);
+    return 0;
+  }
+
+  rewind(pFile); 
+  i = 0; j = 0; 
+  pb = buff;
+  while((c = fgetc(pFile)) != EOF) {
+    if(c == sep || c == '\n') {
+      *pb = '\0';
+      *tm_at(dst,i,j++) = (tmVal) strtod(buff, &pb);
+      pb = buff;
+      if(c == '\n') {
+        i ++; j = 0;
+      }
+    } else {
+      *pb++ = (char) c;
+    }
+  }
+  *pb = '\0';
+  *tm_at(dst,i,j++) = (tmVal) strtod(buff, &pb);
+
+  fclose(pFile);
+  return 1;
+}
+

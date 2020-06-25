@@ -11,6 +11,8 @@
 
 #define tm_to_csv(mat,fname)    tm_to_file(mat,fname,',')
 
+#define tm_from_csv(mat,fname)  tm_from_file(mat,fname,',')
+
 /** 
  * @brief Simple matrix visualization.
  * @param m matrix object. 
@@ -30,5 +32,13 @@ const char* tm_error(int code);
  * @return 1 in case of success.
  */
 int tm_to_file(tMat* m, char* fname, char sep);
+/**
+ * @brief Initialize matrix from file 
+ * @param dst matrix object.
+ * @param fname file name.
+ * @param sep separator character.
+ * @return 1 in case of success.
+ */
+int tm_from_file(tMat* dst, char* fname, char sep);
 
 #endif /* T_MATRIX_IO_H */

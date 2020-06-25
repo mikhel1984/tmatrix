@@ -100,7 +100,12 @@ static char* test_init()
   
   tm_set(&m, 0, 0, 1e-5, &err);
   tm_print(&m);
-  tm_to_file(&m, "matrix.csv", ',');
+
+  mu_assert("Init (save to file)", tm_to_file(&m, "matrix.csv", ','));
+  mu_assert("Init (read from file)", tm_from_file(&m2, "matrix.csv", ','));
+  for(i = 0; i < 9; i++) {
+    mu_assert("Init: wrong file read", EQL(m.data[i], m2.data[i]));
+  }
 
   tm_clear(&m);
   tm_clear(&cp);
