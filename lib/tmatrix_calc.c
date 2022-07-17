@@ -14,7 +14,7 @@
 #define PINV_TOL     1E-9
 #define MEM_TMP_VEC 8
 
-
+/* dst += m */
 int tm_add(tMat *dst, tMat* m, int* err) 
 {
   int i,j,R,C, e = 0;
@@ -45,6 +45,7 @@ end_add:
   return !e;
 }
 
+/* dst -= m */
 int tm_sub(tMat *dst, tMat* m, int* err) 
 {
   int i,j,R,C, e = 0;
@@ -76,6 +77,7 @@ end_sub:
   return !e;
 }
 
+/* dst *= k */
 int tm_scale(tMat *dst, tmVal k, int* err)
 {
   int R,C,i,j, e = 0;
@@ -102,7 +104,7 @@ end_scale:
   return !e;
 }
 
-
+/* dst = a * b */
 int tm_mul(tMat* dst, tMat *a, tMat *b, int *err)
 {
   tmSize R1,C1,C2;
@@ -138,6 +140,7 @@ end_mul:
   return !e;
 }
 
+/* LU decomposition */
 void ludcmp(tMat *dst, int indx[], tmVal* d, int *err)
 {
   int i, imax, j, k, n;
@@ -212,6 +215,7 @@ end_ludcmp:
   if(n > MEM_TMP_VEC) free(vv);  
 }
 
+/* LU back */
 void lubksb(tMat *src, int indx[], tMat *b)
 {
   int i, ii = -1, ip, j, n;
@@ -240,6 +244,7 @@ void lubksb(tMat *src, int indx[], tMat *b)
   }   
 }
 
+/* Determinant */
 tmVal tm_det(tMat *m, int *err)
 {
   int e = 0, n, j, n1, n2;
@@ -268,7 +273,7 @@ end_det:
   return d;
 }
 
-
+/* Inversion */
 int tm_inv(tMat *dst, tMat *m, int *err)
 {
   int e = 0, n = 0, *idx = NULL, i, j;
@@ -312,6 +317,7 @@ end_inv:
   return !e;
 }
 
+/* Pseudoinverse aux 1 */
 tMat pinva(tMat *src, int* transp, tmVal* tolerance, int* err)
 {
   int e = 0, m, n, i;
@@ -350,6 +356,7 @@ end_pinva:
   return A;
 }
 
+/* Pseudoinverse aux 2 */
 tMat pinvl(tMat *A, tmVal tol, int *rr, int *err)
 {
   int e = 0, n, r = 0, k, xx, n2;
@@ -412,6 +419,7 @@ end_pinvl:
   return L;  
 }
 
+/* Pseudoinverse */
 int tm_pinv(tMat* dst, tMat *src, int *err)
 {
   int e = 0, transp = 0, r, n;
@@ -457,6 +465,7 @@ end_pinv:
   return !e;
 }
 
+/* Rank */
 int tm_rank(tMat* m, int* err)
 {
   int e = 0, res = 0, i,j, R = 0,C, q;

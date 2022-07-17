@@ -40,5 +40,10 @@ int tm_to_file(tMat* m, char* fname, char sep);
  * @return 1 in case of success.
  */
 int tm_from_file(tMat* dst, char* fname, char sep);
+/**
+ * @briev Print quaternion.
+ * @param q quaternion object.
+ */
+void qn_print(tQn* q);
 
 #endif /* T_MATRIX_IO_H */

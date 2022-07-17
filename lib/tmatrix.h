@@ -26,6 +26,7 @@
 #define NULL_TMATRIX {0,0,0,0,0}  /**< Empty matrix initialization. */
 #define TM_VERTICAL   1           /**< Vertical concatenation. */
 #define TM_HORIZONTAL 0           /**< Horizontal concatenation. */
+#define NULL_TQN {0, 0, 0, 0}
 /** 
  * @brief Get empty matrix with dynamically allocated memory.
  */
@@ -64,6 +65,15 @@ typedef struct tMat_ {
    tmSize width;               /**< Parameter is used for index evaluation. */
    tmSize type;                /**< Type of memory / element access. */
 }  tMat;
+/**
+ * @brief Quaternion object.
+ */
+typedef struct tQn_ {
+   tmVal w;                    /**< Real value.        */
+   tmVal x;                    /**< Imaginary i value. */
+   tmVal y;                    /**< Imaginary j value. */
+   tmVal z;                    /**< Imaginary k value. */
+}  tQn;
 
 /** 
  * @brief Create matrix of given size.

@@ -16,7 +16,7 @@ void tm_print(tMat *m)
 {
   int i, j, R, C;
   if(!m) {
-    printf("No matrix!");  
+    puts("No matrix!");  
     return;    
   }
   R = m->rows;
@@ -94,7 +94,6 @@ int tm_to_file(tMat* m, char* fname, char sep)
 }
 
 /* Initialize matrix from file */
-
 int tm_from_file(tMat* dst, char* fname, char sep)
 {
   int i = 0, j = 0, c;
@@ -139,5 +138,15 @@ int tm_from_file(tMat* dst, char* fname, char sep)
 
   fclose(pFile);
   return 1;
+}
+
+/* Show quaternion */
+void qn_print(tQn* q)
+{
+  if(q) {
+    printf("{w:%f x:%f y:%f z:%f}\n", q->w, q->x, q->y, q->z);
+  } else {
+    puts("No quaternion");
+  }
 }
 

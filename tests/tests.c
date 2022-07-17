@@ -5,6 +5,7 @@
 #include "../lib/tmatrix_homo.h"
 #include "../lib/tmatrix_vec.h"
 #include "../lib/tmatrix_io.h"
+#include "../lib/tmatrix_rot.h"
 #include "minunit.h"
 
 #define EQL(X,Y) fabs((X)-(Y)) < 1E-6
@@ -28,6 +29,8 @@ static char* test_homo();
 static char* test_vec();
 static char* test_rank();
 static char* test_make();
+static char* test_quaternion();
+static char* test_rotation();
 
 /* ~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -64,6 +67,8 @@ static char* all_tests()
   mu_run(test_vec);
   mu_run(test_rank);
   mu_run(test_make);
+  mu_run(test_quaternion);
+  mu_run(test_rotation);
   
   return 0;
 }
@@ -562,3 +567,116 @@ static char* test_make()
   
   return 0;
 } 
+
+static char *test_quaternion()
+{
+  int err = 0;
+  tQn q1 = {0, 1, 2, 3};
+  tQn q2 = {4, 5 ,6, 7};
+  tQn qq, q3;
+  
+  qn_print(&q1);
+
+  qq = qn_add(&q1, &q2, &err);
+  mu_check("Qn (add):", err);
+  mu_assert("Qn (add): wrong sum", EQL(qq.w, q1.w+q2.w));
+  mu_assert("Qn (add): wrong sum", EQL(qq.z, q1.z+q2.z));
+
+  qq = qn_sub(&q1, &q2, &err);
+  mu_check("Qn (sub):", err);
+  mu_assert("Qn (sub): wrong sub", EQL(qq.x, q1.x-q2.x));
+  mu_assert("Qn (sub): wrong sub", EQL(qq.y, q1.y-q2.y));
+
+  q3 = q2;
+  mu_assert("Qn (normalize): normalization error", qn_normalize(&q3) == 1);
+  mu_assert("Qn (norm): wrong value", EQL(1.0, qn_abs(&q3)));
+
+  qq = qn_inv(&q2, &err);
+  mu_check("Qn (inv):", err);  
+  qq = qn_mul(&qq, &q2, &err);
+  mu_check("Qn (mul):", err);
+  mu_assert("Qn (mul): wrong product", EQL(1.0, qq.w));
+  mu_assert("Qn (mul): wrong product", EQL(0.0, qq.y));
+  
+  qq = qn_scale(&q2, 1/qn_abs(&q2), &err);
+  mu_check("Qn (scale):", err);
+  mu_assert("Qn (scale): wrong scale", EQL(qq.x, q3.x));
+  mu_assert("Qn (scale): wrong scale", EQL(qq.z, q3.z));
+  
+  qq = qn_conj(&q1, &err);
+  mu_check("Qn (conj):", err);
+  mu_assert("Qn (conj): wrong value", EQL(qq.y, -q1.y));
+  mu_assert("Qn (conj): wrong value", EQL(qq.w, q1.w));
+  
+  qn_normalize(&q1);
+  qq = qn_slerp(&q1, &q3, 1, &err);
+  mu_check("Qn (slerp):", err);
+  mu_assert("Qn (slerp): wrong value", EQL(qq.w, q3.w));
+  mu_assert("Qn (slerp): wrong value", EQL(qq.x, q3.x));
+
+  return 0;
+}
+
+static char* test_rotation()
+{
+  int err = 0, i, j;
+  tmVal roll = 0.1, pitch = -0.3, yaw = 0.5;
+  tmVal arr[9] = {0}, angle, v1, v2, v3;
+  tMat axis, m1, m2, m3;
+  tQn quat = NULL_TQN;
+  
+  m1 = tm_static(3,3,arr,&err);
+  m2 = tm_new(3,3,&err);
+  
+  rot_rpy(&m1, roll, pitch, yaw, &err);
+  mu_check("Rot (rpy):", err);
+  rot_inv(&m2, &m1, &err);
+  mu_check("Rot (inv):", err);
+  
+  m3 = tm_copy(&m2, &err);
+  tm_mul(&m2, &m1, &m3, &err);
+  mu_check("Rot (mul):", err);
+  for(i = 0; i < 3; ++i) {
+    for(j = 0; j < 3; ++j) {
+      mu_assert("Rot (inv): wrong value", EQL(tm_get(&m2,i,j,0), (i==j ? 1.0 : 0.0)));
+    }
+  }
+  
+  axis = vec_new(3, &err);
+  rot_toaa(&axis, &angle, &m1, &err);
+  mu_check("Rot (to aa):", err);
+  
+  rot_aa(&m2, &axis, angle, &err);
+  mu_check("Rot (aa):", err);
+  for(i = 0; i < 3; ++i) {
+    for(j = 0; j < 3; ++j) {
+      mu_assert("Rot (aa): wrong value", EQL(tm_get(&m1,i,j,0), tm_get(&m2,i,j,0)));
+    }
+  }
+  
+  rot_toqn(&quat, &m2, &err);
+  mu_check("Rot (toqn):", err);
+  
+  tm_eye(&m2, &err);
+  mu_check("Rot (eye):", err);
+  rot_qn(&m2, &quat, &err);
+  mu_check("Rot (qn):", err);
+  for(i = 0; i < 3; ++i) {
+    for(j = 0; j < 3; ++j) {
+      mu_assert("Rot (qn): wrong value", EQL(tm_get(&m1,i,j,0), tm_get(&m2,i,j,0)));
+    }
+  }
+  
+  rot_torpy(&v1, &v2, &v3, &m2, &err);
+  mu_check("Rot (torpy):", err);
+  mu_assert("Rot (torpy): wrong angle", EQL(v1,roll));
+  mu_assert("Rot (torpy): wrong angle", EQL(v2,pitch));
+  mu_assert("Rot (torpy): wrong angle", EQL(v3,yaw));
+  
+  tm_clear(&axis);
+  tm_clear(&m1);
+  tm_clear(&m2);
+  tm_clear(&m3);
+  
+  return 0;
+}

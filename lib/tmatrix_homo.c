@@ -12,6 +12,7 @@
 #define HOMO_SIDE  4
 #define HOMO_MASK {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1}
 
+/* Check matrix type */
 int is_homogenous(tMat *m, int *err)
 {
   int e = 0;
@@ -29,6 +30,7 @@ end_homogenous:
   return !e;
 }
 
+/* Do copy */
 int copy_data(tMat* m, tmVal v[])
 {
   int i;
@@ -39,6 +41,7 @@ int copy_data(tMat* m, tmVal v[])
   return 1;
 }
 
+/* Initialize translation matrix */
 int h_Txyz(tMat* dst, tmVal x, tmVal y, tmVal z, int *err) 
 {
   tmVal arr[TM_HOMO_SIZE] = HOMO_MASK;
@@ -49,6 +52,7 @@ int h_Txyz(tMat* dst, tmVal x, tmVal y, tmVal z, int *err)
   return is_homogenous(dst, err) && copy_data(dst, arr);
 }
 
+/* Initialize Z rotation matrix */
 int h_Rz(tMat* dst, tmVal a, int *err) 
 {
   tmVal c, s;
@@ -60,6 +64,7 @@ int h_Rz(tMat* dst, tmVal a, int *err)
   return is_homogenous(dst, err) && copy_data(dst, arr);
 }
 
+/* Initialize Y rotation matrix */
 int h_Ry(tMat* dst, tmVal b, int *err) 
 {
   tmVal c, s;
@@ -71,6 +76,7 @@ int h_Ry(tMat* dst, tmVal b, int *err)
   return is_homogenous(dst, err) && copy_data(dst, arr);
 }
 
+/* initialize X rotation matrix */
 int h_Rx(tMat* dst, tmVal v, int *err) 
 {
   tmVal c, s;
@@ -82,6 +88,7 @@ int h_Rx(tMat* dst, tmVal v, int *err)
   return is_homogenous(dst, err) && copy_data(dst, arr);
 }
 
+/* Get parameter using DH notation */
 int h_DH(tMat* dst, tmVal a, tmVal alpha, tmVal d, tmVal theta, int *err) 
 {
   tmVal ca, sa, cth, sth;
@@ -95,6 +102,7 @@ int h_DH(tMat* dst, tmVal a, tmVal alpha, tmVal d, tmVal theta, int *err)
   return is_homogenous(dst, err) && copy_data(dst, arr);
 }
 
+/* Homogeneous matrix product */
 int h_mul(tMat *dst, tMat *m, int* err) 
 {
   tmVal arr[TM_HOMO_SIZE] = HOMO_MASK;
@@ -120,9 +128,10 @@ int h_mul(tMat *dst, tMat *m, int* err)
   } else
     return 0;
   
-  return copy_data(dst, arr);   
+  return copy_data(dst, arr);
 }
 
+/* Homogeneous matrix inversion */
 int h_inv(tMat *dst, int *err)
 {
   tmVal *a;
@@ -144,6 +153,7 @@ int h_inv(tMat *dst, int *err)
   return copy_data(dst,arr);
 }
 
+/* Homogeneous matrix transpose */
 int h_T(tMat *dst, int *err)
 {
   tmVal *a;
@@ -160,6 +170,7 @@ int h_T(tMat *dst, int *err)
   return copy_data(dst,arr);
 }
 
+/* Identity matrix */
 int h_eye(tMat *dst, int *err)
 {
   static tmVal arr[TM_HOMO_SIZE] = HOMO_MASK;

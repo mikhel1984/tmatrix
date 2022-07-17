@@ -8,7 +8,7 @@ LIBS = -lm
 
 # sources 
 SRC = lib/tmatrix.c lib/tmatrix_calc.c lib/tmatrix_homo.c lib/tmatrix_vec.c \
-      lib/tmatrix_io.c
+      lib/tmatrix_io.c lib/tmatrix_rot.c
 MAIN = example.c $(SRC)
 TEST = tests/tests.c $(SRC)
 

@@ -54,10 +54,10 @@ tMat tm_new(tmSize r, tmSize c, int* err)
     res.data = (tmVal*) calloc(r*c, sizeof(tmVal));
     if(res.data) {
       res.rows = r;
-      res.width = res.cols = c;    
+      res.width = res.cols = c;
     } else 
-      e = TM_ERR_NO_MEMORY;      
-  } else if(!r && !c) {    
+      e = TM_ERR_NO_MEMORY;
+  } else if(!r && !c) {
     /* allow empty matrix for further usage in tm_mul */
   } else 
     e = TM_ERR_WRONG_SIZE;
@@ -79,7 +79,7 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err)
   res.data = dat;
   res.rows = r;
   res.width = res.cols = c;
-  res.type = TM_STATIC;      
+  res.type = TM_STATIC;
    
 end_static:
   if(err) *err = e;
@@ -124,7 +124,7 @@ void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err)
   *tm_at(m,r,c) = v;
    
 end_set:
-  if(err) *err = e;  
+  if(err) *err = e;
 }
 
 /* Get row number */
@@ -157,19 +157,19 @@ tMat tm_copy(tMat* src, int* err)
   data = (tmVal*) malloc(j * sizeof(tmVal));
   if(data) {
     res.data = data;
-    res.type = TM_ALLOC;        
+    res.type = TM_ALLOC;
     if(IS_PRIM(src)) {
       p = src->data;
       for(i = 0; i < j; i++) 
-        *data++ = *p++;               
+        *data++ = *p++;
     } else {
       for(i = 0; i < res.rows; i++) {
         for(j = 0; j < res.cols; j++) 
-          *data++ = *tm_at(src,i,j);	          
+          *data++ = *tm_at(src,i,j);
       }
     }
   } else 
-    e = TM_ERR_NO_MEMORY;         
+    e = TM_ERR_NO_MEMORY;
       
 end_copy:
   if(err) *err = e;
@@ -181,7 +181,7 @@ end_copy:
 tMat tm_T(tMat* src, int *err) 
 {
   tMat res = NULL_TMATRIX;
-  int e = 0;    
+  int e = 0;
 
   TM_ASSERT_ARGS(src, e, end_T);
   
@@ -217,7 +217,7 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err)
     e = TM_ERR_NOT_MAIN;
 
 end_block:
-  if(err) *err = e;  
+  if(err) *err = e;
   return res;
 }
 
@@ -249,7 +249,7 @@ int tm_insert(tMat *dst, tMat *src, int* err)
   if(R == src->rows && C == src->cols) {
     for(i = 0; i < R; i++) {
       for(j = 0; j < C; j++) 
-        *tm_at(dst,i,j) = *tm_at(src,i,j);            
+        *tm_at(dst,i,j) = *tm_at(src,i,j);
     }
   } else 
     e = TM_ERR_DIFF_SIZE;
@@ -292,7 +292,7 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C,
     /* find values */ 
     for(i = 0; !e && i < R; i++) {
       for(j = 0; !e && j < C; j++) 
-        *data++ = rule(src,N,i,j,&e);          
+        *data++ = rule(src,N,i,j,&e);
     }   
   } else 
     e = TM_ERR_NO_MEMORY; 
