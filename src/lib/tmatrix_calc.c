@@ -274,11 +274,11 @@ end_det:
 }
 
 /* Inversion */
-int tm_inv(tMat *dst, tMat *m, int *err)
+tmVal tm_inv(tMat *dst, tMat *m, int *err)
 {
   int e = 0, n = 0, *idx = NULL, i, j;
   int arr[MEM_TMP_VEC] = {0};
-  tmVal d;
+  tmVal d, cond = 0.0;
   tMat tmp = NULL_TMATRIX, col;
    
   TM_ASSERT_ARGS(m && dst && m != dst, e, end_inv);
@@ -301,6 +301,10 @@ int tm_inv(tMat *dst, tMat *m, int *err)
               col = tm_block(dst,0,j,n,1,&e);   if(e) break;
               lubksb(&tmp,idx,&col);
             }
+            // check condition number
+            cond = tm_cond(m, dst, &e);
+            if(!e && !(cond > 0.0))
+              e = TM_ERR_NO_SOLUTN;
           }
         } else 
           e = TM_ERR_NO_MEMORY;
@@ -308,13 +312,13 @@ int tm_inv(tMat *dst, tMat *m, int *err)
     } 
   } else 
     e = TM_ERR_NOT_DEF;
-  
+    
 end_inv:
   if(n > MEM_TMP_VEC) free(idx);
   tm_clear(&tmp);
    
   if(err) *err = e;
-  return !e;
+  return cond;
 }
 
 /* Pseudoinverse aux 1 */
@@ -520,4 +524,49 @@ end_rank:
   if(R > MEM_TMP_VEC) free(ptr);
 
   return res;
+}
+
+/* Square norm */
+tmVal tm_norm2(tMat* m, int* err) 
+{
+  int i, j, R, C, e = 0;
+  tmVal a, norm2 = 0.0;
+
+  TM_ASSERT_ARGS(m, e, end_norm2);
+   
+  R = m->rows;
+  C = m->cols; 
+  for(i = 0; i < R; i++) {
+    for(j = 0; j < C; j++) {
+      a = *tm_at(m,i,j);
+      norm2 += (a * a);
+    }
+  }
+  
+end_norm2:
+  if(err) *err = e;
+  
+  return sqrt(norm2);
+}
+
+/* Condition number */
+tmVal tm_cond(tMat *m, tMat *minv, int *err)
+{
+  int e = 0, rA;
+  tmVal cond = 0.0;
+  
+  TM_ASSERT_ARGS(m && minv, e, end_cond);
+  
+  rA = tm_rank(m, &e);
+  if(!e) {
+    if (rA > 0)
+      cond = tm_norm2(m, &e) * tm_norm2(minv, &e) / rA;
+    else
+      e = TM_ERR_NO_SOLUTN;
+  }
+    
+end_cond:
+  if(err) *err = e;
+  
+  return cond;
 }

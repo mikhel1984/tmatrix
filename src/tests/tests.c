@@ -297,7 +297,7 @@ static char* test_prod()
 static char* test_inv()
 {
   int err = 0,i,j;
-  tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d;
+  tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d, cond;
   tMat m, im, pr; 
    
   m = tm_static(3,3,a1,&err);
@@ -308,8 +308,9 @@ static char* test_inv()
   mu_assert("Inv (det): wrong value", EQL(d,-76));
    
   im = tm_new(0,0,&err);
-  tm_inv(&im, &m, &err);
+  cond = tm_inv(&im, &m, &err);
   mu_check("Inv (det):", err);
+  mu_assert("Inv (inv): bad condition number", cond > 0 && cond < 1E14);
   pr = tm_simp();
   
   tm_mul(&pr,&m,&im,&err); 

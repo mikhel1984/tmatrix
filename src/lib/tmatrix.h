@@ -273,9 +273,9 @@ tmVal tm_det(tMat *m, int *err);
  * @param dst matrix for result.
  * @param m matrix object.
  * @param err error code.
- * @return 1 in case of success.
+ * @return condition number of operation.
  */
-int tm_inv(tMat *dst, tMat *m, int *err);
+tmVal tm_inv(tMat *dst, tMat *m, int *err);
 /** 
  * @brief Find pseudo-inverted matrix.
  * 
@@ -292,5 +292,20 @@ int tm_pinv(tMat* dst, tMat *m, int *err);
  * @return Rank value.
  */
 int tm_rank(tMat *m, int *err);
+/**
+ * @brief Square of the matrix norm.
+ * @param m matrix object.
+ * @param err error code.
+ * @return Square norm.
+ */
+tmVal tm_norm2(tMat* m, int* err);
+/**
+ * @brief Condition number estimation.
+ * @param m original matrix.
+ * @param minv matrix inversion.
+ * @param err error code.
+ * @return condition number, 0 in case of error.
+ */
+tmVal tm_cond(tMat *m, tMat *minv, int *err);
 
 #endif /* T_MATRIX_H */
