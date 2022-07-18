@@ -299,13 +299,5 @@ int tm_rank(tMat *m, int *err);
  * @return Square norm.
  */
 tmVal tm_norm2(tMat* m, int* err);
-/**
- * @brief Condition number estimation.
- * @param m original matrix.
- * @param minv matrix inversion.
- * @param err error code.
- * @return condition number, 0 in case of error.
- */
-tmVal tm_cond(tMat *m, tMat *minv, int *err);
 
 #endif /* T_MATRIX_H */

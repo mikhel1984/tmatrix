@@ -14,6 +14,23 @@
 #define PINV_TOL     1E-9
 #define MEM_TMP_VEC 8
 
+/* Condition number */
+tmVal tm_cond(tMat *m, tMat *minv, int *err)
+{
+  int e = 0, rA;
+  tmVal cond = 0.0;
+  
+  rA = tm_rank(m, &e);
+  if (rA > 0)
+    cond = tm_norm2(m, &e) * tm_norm2(minv, &e) / rA;
+  else
+    e = TM_ERR_NO_SOLUTN;
+
+  if(err) *err = e;
+  
+  return !e ? cond : 0.0;
+}
+
 /* dst += m */
 int tm_add(tMat *dst, tMat* m, int* err) 
 {
@@ -549,24 +566,4 @@ end_norm2:
   return sqrt(norm2);
 }
 
-/* Condition number */
-tmVal tm_cond(tMat *m, tMat *minv, int *err)
-{
-  int e = 0, rA;
-  tmVal cond = 0.0;
-  
-  TM_ASSERT_ARGS(m && minv, e, end_cond);
-  
-  rA = tm_rank(m, &e);
-  if(!e) {
-    if (rA > 0)
-      cond = tm_norm2(m, &e) * tm_norm2(minv, &e) / rA;
-    else
-      e = TM_ERR_NO_SOLUTN;
-  }
-    
-end_cond:
-  if(err) *err = e;
-  
-  return cond;
-}
+
