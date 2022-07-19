@@ -311,6 +311,9 @@ static char* test_inv()
   cond = tm_inv(&im, &m, &err);
   mu_check("Inv (det):", err);
   mu_assert("Inv (inv): bad condition number", cond > 0 && cond < 1E14);
+  
+  mu_assert("Inv (cond): wrong condition number", EQL(cond, tm_cond(&m, &err)));
+  mu_check("Inv (cond):", err);
   pr = tm_simp();
   
   tm_mul(&pr,&m,&im,&err); 

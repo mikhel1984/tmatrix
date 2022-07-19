@@ -299,5 +299,12 @@ int tm_rank(tMat *m, int *err);
  * @return Square norm.
  */
 tmVal tm_norm2(tMat* m, int* err);
+/**
+ * @brief Find condition number of the matrix.
+ * @param m matrix object.
+ * @param err error code.
+ * @return condition number.
+ */
+tmVal tm_cond(tMat* m, int* err);
 
 #endif /* T_MATRIX_H */

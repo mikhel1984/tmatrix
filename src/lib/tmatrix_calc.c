@@ -14,8 +14,8 @@
 #define PINV_TOL     1E-9
 #define MEM_TMP_VEC 8
 
-/* Condition number */
-tmVal tm_cond(tMat *m, tMat *minv, int *err)
+/* Condition number (internal) */
+tmVal tm_cond_(tMat *m, tMat *minv, int *err)
 {
   int e = 0, rA;
   tmVal cond = 0.0;
@@ -319,7 +319,7 @@ tmVal tm_inv(tMat *dst, tMat *m, int *err)
               lubksb(&tmp,idx,&col);
             }
             // check condition number
-            cond = tm_cond(m, dst, &e);
+            cond = tm_cond_(m, dst, &e);
             if(!e && !(cond > 0.0))
               e = TM_ERR_NO_SOLUTN;
           }
@@ -335,6 +335,25 @@ end_inv:
   tm_clear(&tmp);
    
   if(err) *err = e;
+  return cond;
+}
+
+/* Find condition number */
+tmVal tm_cond(tMat* m, int* err)
+{
+  int e = 0;
+  tmVal cond = 0.0;
+  /* allocate memory */
+  tMat minv = tm_copy(m, &e); 
+  
+  if(!e) {
+    /* condition number is calculated inside the tm_inv function */
+    cond = tm_inv(&minv, m, &e);
+  }
+  
+  if(err) *err = e;
+  tm_clear(&minv);
+  
   return cond;
 }
 
