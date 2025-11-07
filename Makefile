@@ -16,7 +16,8 @@ OBJL = \
        src/lib/tmatrix_homo.o \
        src/lib/tmatrix_vec.o \
        src/lib/tmatrix_io.o \
-       src/lib/tmatrix_rot.o
+       src/lib/tmatrix_rot.o \
+       src/lib/tmatrix_transform.o
 OBJM = src/example.o
 OBJT = src/tests/tests.o
 
@@ -45,6 +46,7 @@ src/lib/tmatrix_homo.o: src/lib/tmatrix_homo.c
 src/lib/tmatrix_vec.o: src/lib/tmatrix_vec.c
 src/lib/tmatrix_io.o: src/lib/tmatrix_io.c
 src/lib/tmatrix_rot.o: src/lib/tmatrix_rot.c
+src/lib/tmatrix_transform.o: src/lib/tmatrix_transform.c
 src/example.o: src/example.c
 src/tests/tests.o: src/tests/tests.c
 
