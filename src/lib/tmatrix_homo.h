@@ -16,6 +16,7 @@
  * @brief Homogeneous matrix size. 
  */
 #define TM_HOMO_SIZE 16
+
 /**
  * @brief Get matrix for X translation.
  * @param dst pointer to matrix.
@@ -24,6 +25,7 @@
  * @return 1 in case of success.
  */
 #define h_Tx(dst,x,err)  h_Txyz(dst,x,0,0,err)
+
 /**
  * @brief Get matrix for Y translation.
  * @param dst pointer to matrix.
@@ -32,6 +34,7 @@
  * @return 1 in case of success.
  */
 #define h_Ty(dst,y,err)  h_Txyz(dst,0,y,0,err)
+
 /**
  * @brief Get matrix for Z translation.
  * @param dst pointer to matrix.
@@ -40,6 +43,7 @@
  * @return 1 in case of success.
  */
 #define h_Tz(dst,z,err)  h_Txyz(dst,0,0,z,err)
+
 /**
  * @brief Create homogeneous matrix with dynamic memory.
  * @param err error code.
@@ -47,12 +51,14 @@
  * @note Free memory with @a tm_clear.
  */
 #define h_new(err)       tm_new(4,4,err)
+
 /**
  * @brief Create homogeneous matrix with static memory.
  * @param err error code.
  * @return New matrix.
  */
 #define h_static(d,err)  tm_static(4,4,d,err)
+
 /**
  * @brief Get matrix for combined X-Y-Z translations.
  * @param dst destination matrix.
@@ -63,6 +69,7 @@
  * @return 1 in case of success.
  */
 int h_Txyz(tMat* dst, tmVal x, tmVal y, tmVal z, int *err);
+
 /**
  * @brief Get matrix for Z rotation.
  * @param dst destination matrix.
@@ -71,6 +78,7 @@ int h_Txyz(tMat* dst, tmVal x, tmVal y, tmVal z, int *err);
  * @return 1 in case of success.
  */
 int h_Rz(tMat* dst, tmVal a, int *err);
+
 /**
  * @brief Get matrix for Y rotation.
  * @param dst destination matrix.
@@ -79,6 +87,7 @@ int h_Rz(tMat* dst, tmVal a, int *err);
  * @return 1 in case of success.
  */
 int h_Ry(tMat* dst, tmVal b, int *err);
+
 /**
  * @brief Get matrix for X rotation.
  * @param dst destination matrix.
@@ -87,6 +96,7 @@ int h_Ry(tMat* dst, tmVal b, int *err);
  * @return 1 in case of success.
  */
 int h_Rx(tMat* dst, tmVal v, int *err);
+
 /** 
  * @brief Find matrix for Denavit-Hartenberg parameters.
  * @param dst destination matrix.
@@ -98,6 +108,7 @@ int h_Rx(tMat* dst, tmVal v, int *err);
  * @return 1 in case of success.
  */
 int h_DH(tMat* dst, tmVal a, tmVal alpha, tmVal d, tmVal theta, int *err);
+
 /** 
  * @brief Multiply matrices.
  * 
@@ -108,6 +119,7 @@ int h_DH(tMat* dst, tmVal a, tmVal alpha, tmVal d, tmVal theta, int *err);
  * @return 1 in case of success. 
  */
 int h_mul(tMat *dst, tMat *m, int* err);
+
 /** 
  * @brief Find inverted matrix.
  * 
@@ -117,6 +129,7 @@ int h_mul(tMat *dst, tMat *m, int* err);
  * @return 1 in case of success.
  */
 int h_inv(tMat *dst, int *err);
+
 /** 
  * @brief Find transposed matrix.
  * 
@@ -126,6 +139,7 @@ int h_inv(tMat *dst, int *err);
  * @return 1 in case of success.
  */
 int h_T(tMat *dst, int *err);
+
 /** 
  * @brief Initialize identity matrix.
  * 

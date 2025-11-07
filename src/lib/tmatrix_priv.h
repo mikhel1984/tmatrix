@@ -14,6 +14,7 @@
 #define TM_ALLOC     1   /**< Matrix contains pointer to dynamic memory. */
 #define TM_TRANSPOSE 2   /**< Matrix has link to another matrix data and define transposition access. */
 #define TM_SUB       3   /**< Matrix has link to another matrix data and define sub matrix access. */
+
 /**
  * @brief Check if the matrix has direct access to the data.
  * @param X pointer to matrix.
@@ -61,6 +62,7 @@ enum TM_ERR {
  * @return Pointer to matrix element.
  */
 tmVal* tm_at(tMat* m, tmSize r, tmSize c);
+
 /**
  * @brief Check matrix size, correct if need and possible.
  * @param m matrix object.

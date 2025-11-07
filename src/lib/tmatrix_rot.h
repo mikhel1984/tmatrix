@@ -28,6 +28,7 @@
  * @return 1 in case of success.
  */
 int rot_rpy(tMat* m, tmVal roll, tmVal pitch, tmVal yaw, int* err);
+
 /**
  * @brief Get Euler angles from the matrix.
  *
@@ -39,6 +40,7 @@ int rot_rpy(tMat* m, tmVal roll, tmVal pitch, tmVal yaw, int* err);
  * @return 1 in case of success.
  */
 int rot_torpy(tmVal* roll, tmVal* pitch, tmVal* yaw, tMat* r, int *err);
+
 /**
  * @brief Get matrix from axis-angle representation.
  *
@@ -49,6 +51,7 @@ int rot_torpy(tmVal* roll, tmVal* pitch, tmVal* yaw, tMat* r, int *err);
  * @return 1 in case of success.
  */
 int rot_aa(tMat* m, tMat* k, tmVal a, int* err);
+
 /**
  * @brief Get axin and angle from the matrix.
  * 
@@ -59,6 +62,7 @@ int rot_aa(tMat* m, tMat* k, tmVal a, int* err);
  * @return 1 in case of success.
  */
 int rot_toaa(tMat* k, tmVal* a, tMat* r, int* err);
+
 /**
  * @brief Get matrix from unit quaternion.
  *
@@ -68,6 +72,7 @@ int rot_toaa(tMat* k, tmVal* a, tMat* r, int* err);
  * @return 1 in case of success.
  */
 int rot_qn(tMat* m, tQn* q, int* err);
+
 /**
  * @brief Get quaternion from the matrix.
  *
@@ -77,6 +82,7 @@ int rot_qn(tMat* m, tQn* q, int* err);
  * @return 1 in case of success.
  */
 int rot_toqn(tQn* q, tMat* r, int* err);
+
 /**
  * @brief Inversion of rotation matrix.
  *
@@ -98,6 +104,7 @@ int rot_inv(tMat* dst, tMat* r, int* err);
  * @return operation result.
  */
 tQn qn_add(tQn* q1, tQn* q2, int* err);
+
 /**
  * @brief Get difference of two quaterions.
  *
@@ -107,6 +114,7 @@ tQn qn_add(tQn* q1, tQn* q2, int* err);
  * @return operation result.
  */
 tQn qn_sub(tQn* q1, tQn* q2, int* err);
+
 /**
  * @brief Get product of two quaterions.
  *
@@ -116,6 +124,7 @@ tQn qn_sub(tQn* q1, tQn* q2, int* err);
  * @return operation result.
  */
 tQn qn_mul(tQn* q1, tQn* q2, int* err);
+
 /** 
  * @brief Multiply quaternion with scalar value.
  *
@@ -125,6 +134,7 @@ tQn qn_mul(tQn* q1, tQn* q2, int* err);
  * @return scaled quaternion.
  */
 tQn qn_scale(tQn* q, tmVal k, int* err);
+
 /**
  * @brief Get quaternion conjugate.
  * 
@@ -133,6 +143,7 @@ tQn qn_scale(tQn* q, tmVal k, int* err);
  * @return conjugation.
  */
 tQn qn_conj(tQn* q, int* err);
+
 /**
  * @brief Get quaternion inversion.
  *
@@ -142,6 +153,7 @@ tQn qn_conj(tQn* q, int* err);
  * @return inverted quaternion.
  */
 tQn qn_inv(tQn* q, int* err);
+
 /**
  * @brief In-place quaternion normalization.
  *
@@ -150,6 +162,7 @@ tQn qn_inv(tQn* q, int* err);
  * @return 1 in case of success.
  */
 int qn_normalize(tQn* q);
+
 /**
  * @brief Find absolute value.
  * 
@@ -157,6 +170,7 @@ int qn_normalize(tQn* q);
  * @return absolute value.
  */
 tmVal qn_abs(tQn* q);
+
 /**
  * @briev Use SLERP to rotate unit quaternion.
  *

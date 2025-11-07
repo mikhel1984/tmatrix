@@ -18,12 +18,14 @@
  * @param m matrix object. 
  */
 void tm_print(tMat *m);
+
 /**
  * @brief Error description.
  * @param code error value.
  * @return Description string.
  */
 const char* tm_error(int code);
+
 /**
  * @brief Save table into file.
  * @param m matrix to save.
@@ -32,6 +34,7 @@ const char* tm_error(int code);
  * @return 1 in case of success.
  */
 int tm_to_file(tMat* m, char* fname, char sep);
+
 /**
  * @brief Initialize matrix from file 
  * @param dst matrix object.
@@ -40,6 +43,7 @@ int tm_to_file(tMat* m, char* fname, char sep);
  * @return 1 in case of success.
  */
 int tm_from_file(tMat* dst, char* fname, char sep);
+
 /**
  * @briev Print quaternion.
  * @param q quaternion object.

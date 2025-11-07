@@ -27,10 +27,12 @@
 #define TM_VERTICAL   1           /**< Vertical concatenation. */
 #define TM_HORIZONTAL 0           /**< Horizontal concatenation. */
 #define NULL_TQN {0, 0, 0, 0}
+
 /** 
  * @brief Get empty matrix with dynamically allocated memory.
  */
 #define tm_simp()          tm_new(0,0,0)
+
 /**
  * @brief Get column.
  * @param mat pointer to matrix object.
@@ -38,6 +40,7 @@
  * @param err error pointer.
  */
 #define tm_col(mat,c,err)  tm_block(mat, 0, c, (mat)->rows, 1, err)
+
 /**
  * @brief Get row.
  * @param mat pointer to matrix object.
@@ -65,6 +68,7 @@ typedef struct tMat_ {
    tmSize width;               /**< Parameter is used for index evaluation. */
    tmSize type;                /**< Type of memory / element access. */
 }  tMat;
+
 /**
  * @brief Quaternion object.
  */
@@ -86,6 +90,7 @@ typedef struct tQn_ {
  * @note Free memory with @a tm_clear.
  */
 tMat tm_new(tmSize r, tmSize c, int* err);
+
 /** 
  * @brief Create matrix from static array.
  *
@@ -98,6 +103,7 @@ tMat tm_new(tmSize r, tmSize c, int* err);
  * @note Be shure that the data array is more of equal to r * c.
  */
 tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
+
 /** 
  * @brief Create identity matrix.
  *
@@ -108,11 +114,13 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
  * @return Identity matrix.
  */
 int tm_eye(tMat* m, int *err);
+
 /** 
  * @brief Clear allocated memory (if need).
  * @param m pointer to matrix.
  */
 void tm_clear(tMat* m);
+
 /** 
  * @brief Get matrix element.
  * @param m matrix object.
@@ -122,6 +130,7 @@ void tm_clear(tMat* m);
  * @return Element value.
  */
 tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err);
+
 /** 
  * @brief Set matrix element.
  * @param m matrix object.
@@ -131,18 +140,21 @@ tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err);
  * @param err error code.
  */
 void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err);
+
 /** 
  * @brief Get number of rows.
  * @param m matrix object.
  * @return Number of rows.
  */
 tmSize tm_rows(tMat* m);
+
 /** 
  * @brief Get number of columns.
  * @param m matrix object.
  * @return Number of columns.
  */
 tmSize tm_cols(tMat* m);
+
 /** 
  * @brief Create deep copy of the matrix.
  * @param src source matrix.
@@ -151,6 +163,7 @@ tmSize tm_cols(tMat* m);
  * @note Free memory with @a tm_clear.
  */
 tMat tm_copy(tMat* src, int *err);
+
 /** 
  * @brief Create transposed copy of the matrix.
  *
@@ -160,6 +173,7 @@ tMat tm_copy(tMat* src, int *err);
  * @return Transposed matrix. 
  */
 tMat tm_T(tMat* src, int *err);
+
 /** 
  * @brief Create sub matrix.
  * 
@@ -173,6 +187,7 @@ tMat tm_T(tMat* src, int *err);
  * @return Sub matrix.
  */
 tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err);
+
 /** 
  * @brief Copy values from source to destination.
  *
@@ -183,6 +198,7 @@ tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err);
  * @return 1 in case of success. 
  */
 int tm_insert(tMat *dst, tMat *src, int* err);
+
 /**
  * @brief Make new matrix, based on list of source matrices and some rule.
  * 
@@ -197,6 +213,7 @@ int tm_insert(tMat *dst, tMat *src, int* err);
  * @note Free memory with @a tm_clear.
  */
 tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, tmVal (*rule)(tMat*,tmSize,tmSize,tmSize,int*), int* err);
+
 /**
  * @brief Concatenate matrices in the list.
  * @param src list of source matrices.
@@ -207,6 +224,7 @@ tMat tm_make(tMat src[], tmSize N, tmSize R, tmSize C, tmVal (*rule)(tMat*,tmSiz
  * @note Free memory with @a tm_clear.
  */
 tMat tm_concat(tMat src[], int N, int dir, int* err);
+
 /**
  * @brief Set zero values.
  * @param dst matrix to change.
@@ -225,6 +243,7 @@ void tm_zeros(tMat* dst);
  * @return 1 in case of success. 
  */
 int tm_add(tMat *dst, tMat* m, int* err);
+
 /** 
  * @brief Subtract two matrices.
  * 
@@ -235,6 +254,7 @@ int tm_add(tMat *dst, tMat* m, int* err);
  * @return 1 in case of success. 
  */
 int tm_sub(tMat *dst, tMat* m, int* err);
+
 /** 
  * @brief Multiply matrix to scalar value.
  * 
@@ -245,6 +265,7 @@ int tm_sub(tMat *dst, tMat* m, int* err);
  * @return 1 in case of success. 
  */
 int tm_scale(tMat *dst, tmVal k, int* err);
+
 /** 
  * @brief Multiply matrices.
  * 
@@ -257,6 +278,7 @@ int tm_scale(tMat *dst, tmVal k, int* err);
  * @return 1 in case of success. 
  */
 int tm_mul(tMat* dst, tMat *a, tMat *b, int *err);
+
 /** 
  * @brief Find determinant.
  * 
@@ -266,6 +288,7 @@ int tm_mul(tMat* dst, tMat *a, tMat *b, int *err);
  * @return Determinant value. 
  */
 tmVal tm_det(tMat *m, int *err);
+
 /** 
  * @brief Find inverted matrix.
  * 
@@ -276,6 +299,7 @@ tmVal tm_det(tMat *m, int *err);
  * @return condition number of operation.
  */
 tmVal tm_inv(tMat *dst, tMat *m, int *err);
+
 /** 
  * @brief Find pseudo-inverted matrix.
  * 
@@ -285,6 +309,7 @@ tmVal tm_inv(tMat *dst, tMat *m, int *err);
  * @return 1 in case of success.
  */
 int tm_pinv(tMat* dst, tMat *m, int *err);
+
 /**
  * @brief Find rank of the matrix.
  * @param m matrix object.
@@ -292,6 +317,7 @@ int tm_pinv(tMat* dst, tMat *m, int *err);
  * @return Rank value.
  */
 int tm_rank(tMat *m, int *err);
+
 /**
  * @brief Square of the matrix norm.
  * @param m matrix object.
@@ -299,6 +325,7 @@ int tm_rank(tMat *m, int *err);
  * @return Square norm.
  */
 tmVal tm_norm2(tMat* m, int* err);
+
 /**
  * @brief Find condition number of the matrix.
  * @param m matrix object.

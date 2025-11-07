@@ -20,6 +20,7 @@
  * @note Free memory with @a tm_clear.
  */
 #define vec_new(n,err)        tm_new(n,1,err)
+
 /**
  * @brief Create vector with static memory.
  * @param n vector length.
@@ -35,6 +36,7 @@
  * @return Vector length or 0 if the object is not a vector.
  */
 tmSize vec_len(tMat *m);
+
 /**
  * @brief Get vector element.
  * @param m matrix object.
@@ -43,6 +45,7 @@ tmSize vec_len(tMat *m);
  * @return Vector element.
  */
 tmVal vec_get(tMat *m, tmSize k, int *err);
+
 /**
  * @brief Update vector element.
  * @param m matrix object.
@@ -51,6 +54,7 @@ tmVal vec_get(tMat *m, tmSize k, int *err);
  * @param err error code.
  */
 void vec_set(tMat *m, tmSize k, tmVal v, int *err);
+
 /**
  * @brief Dot product of two vectors.
  * @param a first vector.
@@ -59,6 +63,7 @@ void vec_set(tMat *m, tmSize k, tmVal v, int *err);
  * @return Product value.
  */
 tmVal vec_dot(tMat *a, tMat *b, int *err);
+
 /**
  * @brief Cross product of two vectors.
  * 
@@ -70,6 +75,7 @@ tmVal vec_dot(tMat *a, tMat *b, int *err);
  * @return 1 in case of success.
  */
 int vec_cross(tMat *res, tMat *a, tMat *b, int *err);
+
 /**
  * @brief Find square of Eucledian norm.
  *
@@ -79,6 +85,7 @@ int vec_cross(tMat *res, tMat *a, tMat *b, int *err);
  * @return Square norm.
  */
 tmVal vec_norm2(tMat *m, int *err);
+
 /**
  * @brief Normalize vector.
  * 
