@@ -222,19 +222,16 @@ end_block:
 }
 
 /* Convert to identity matrix */
-int tm_eye(tMat *dst, int *err)
+void tm_eye(tMat *dst)
 {
-  int i, j, e = 0;
-  TM_ASSERT_ARGS(dst, e, end_eye);
-
-  for(i = 0; i < dst->rows; i++) {
-    for(j = 0; j < dst->cols; j++) 
-      *tm_at(dst,i,j) = (i == j) ? 1 : 0;
+  int i, j;
+  
+  if (dst && dst->data) {
+    for(i = 0; i < dst->rows; i++) {
+      for(j = 0; j < dst->cols; j++) 
+        *tm_at(dst,i,j) = (i == j) ? 1 : 0;
+    }
   }
-
-end_eye:
-  if(err) *err = e;
-  return !e;
 }
 
 /* Copy values from one matrix to another */

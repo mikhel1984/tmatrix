@@ -661,8 +661,7 @@ static char* test_rotation()
   rot_toqn(&quat, &m2, &err);
   mu_check("Rot (toqn):", err);
   
-  tm_eye(&m2, &err);
-  mu_check("Rot (eye):", err);
+  tm_eye(&m2);
   rot_qn(&m2, &quat, &err);
   mu_check("Rot (qn):", err);
   for(i = 0; i < 3; ++i) {

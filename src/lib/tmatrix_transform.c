@@ -108,5 +108,52 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
 
 end_lup:
   if (err) *err = e;
-  if (n > MEM_TMP_VEC) free(idx);  
+  if (2*n > MEM_TMP_VEC) free(idx);  
 }
+
+/* LU decomposition */
+void tf_lu(tMat* L, tMat* U, tMat* m, int* err)
+{
+  int e = 0, n, i, j, k;
+  tmVal s, uii, *L_i;
+
+  TM_ASSERT_ARGS(m && L && U && IS_UNIQUE3(m,L,U), e, end_lu);
+
+  if (m->rows == m->cols) {
+    n = m->rows;
+    if (tm_relevant(L,n,n,&e) && tm_relevant(U,n,n,&e)) {
+      /* prepare */
+      tm_zeros(U);
+      tm_eye(L); 
+      /* fill */
+      for (i = 0; i < n; i++) {
+        L_i = L->data + i*n;
+        /* U */
+        for (j = i; j < n; j++) {
+          s = *tm_at(m,i,j);
+          for (k = 0; k < i; k++) 
+            s -= L_i[k] * (*tm_at(U,k,j));
+          *tm_at(U,i,j) = s;
+        }
+        uii = *tm_at(U,i,i);
+        if (uii == 0.0) {
+          e = TM_ERR_NO_SOLUTN;
+          goto end_lu;
+        }
+        /* L */
+        for (j = i+1; j < n; j++) {
+          s = *tm_at(m,j,i);
+          L_i = L->data + j*n;
+          for (k = 0; k < i; k++) 
+             s -= L_i[k] * (*tm_at(U,k,i));
+          *tm_at(L,j,i) = s/uii;
+        }
+      }
+    }
+  } else
+    e = TM_ERR_NOT_DEF;
+
+end_lu:
+  if (err) *err = e;
+}
+

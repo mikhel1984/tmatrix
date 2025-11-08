@@ -110,10 +110,8 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
  * Initialize matrix with zeros and sets diagonal elements
  * equal to 1.
  * @param m matrix object.
- * @param err error code.
- * @return Identity matrix.
  */
-int tm_eye(tMat* m, int *err);
+void tm_eye(tMat* m);
 
 /** 
  * @brief Clear allocated memory (if need).
