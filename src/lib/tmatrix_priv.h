@@ -22,13 +22,20 @@
  */
 #define IS_PRIM(X) ((X)->type == TM_ALLOC || (X)->type == TM_STATIC)
 
+/**
+ * @brief Check uniquness of pointers.
+ */
+#define IS_UNIQUE3(A,B,C) (A != B && A != C && B != C)
+#define IS_UNIQUE4(A,B,C,D) (A != B && A != C && A != D && B != C && B != D && C != D)
+
+
 /** 
  * @brief Error types. 
  */
 enum TM_ERR {
      TM_ERR_WRONG_SIZE = 1,   /**< Wrong matrix size definition. */
      TM_ERR_NO_MEMORY,        /**< Can't allocate memory. */
-     TM_ERR_EMPTY_ARGS,       /**< Some of mandatory pointers in argument list are empty. */
+     TM_ERR_EMPTY_ARGS,       /**< Some of mandatory pointers in argument list are empty or objects are the same. */
      TM_ERR_NOT_MAIN,         /**< Main matrix (or sometimes static) is expected for current operation. */
      TM_ERR_DIFF_SIZE,        /**< Src and dst have different size. */
      TM_ERR_NOT_COMPAT,       /**< Matrices are not compatible for current operation. */
@@ -73,4 +80,5 @@ tmVal* tm_at(tMat* m, tmSize r, tmSize c);
  */
 int tm_relevant(tMat* m, tmSize R, tmSize C, int* err);
 
+void ludcmp(tMat *dst, int indx[], tmVal* d, int *err);
 #endif /* T_MATRIX_PRIVATE_H */
