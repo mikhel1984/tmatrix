@@ -1,5 +1,9 @@
-
-
+/**
+ * @file tmatrix_transform.c
+ * @author Stanislav Mikhel
+ * @date 2025
+ * @brief Matrix decompositions.
+ */
 #include <stdlib.h>
 #include <math.h>
 #include "tmatrix.h"
@@ -7,10 +11,10 @@
 
 #define MEM_TMP_VEC 8
 
-
-int tf_chol(tMat* dst, tMat* m, int* err)
+/* Cholesky decomposition */
+void tf_chol(tMat* dst, tMat* m, int* err)
 {
-  int e = 0, pos_def = 1, i, j, k, n;
+  int e = 0, i, j, k, n;
   tmVal s = 0, *row_i, *row_j;
 
   TM_ASSERT_ARGS(m && dst && m != dst, e, end_chol);
@@ -32,7 +36,8 @@ int tf_chol(tMat* dst, tMat* m, int* err)
             row_i[j] = s / row_j[j];
           } else {
             if (s < 0) {
-              pos_def = 0; goto end_chol;
+              e = TM_ERR_NOT_POS_DEF;
+              goto end_chol;
             }
             row_i[j] = sqrt(s);
           }
@@ -44,11 +49,9 @@ int tf_chol(tMat* dst, tMat* m, int* err)
   
 end_chol:
   if(err) *err = e;
-
-  return pos_def;
 }
 
-#include <stdio.h>
+/* LUP decomposition */
 void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
 {
   int e = 0, n, i, j;
@@ -73,9 +76,9 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
         for (j = 0; j < n; j++)
           *tm_at(U, i, j) = *tm_at(m, i, j);
       }
-      tm_zeros(P);
+      /* find decomposition */
       ludcmp(U,idx,&tmp,&e); 
-      if (e) { goto end_lup; }
+      if (e) goto end_lup;
       for (i = 0; i < n; i++) {
         /* fill L and U */
         for (j = 0; j < n; j++) {
@@ -88,13 +91,14 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
             *tm_at(U, i, j) = 0;
           }
         }
-        /* fill P */
+        /* row permutations */
         if (idx[i] != i) {
           swap = acc[i];
           acc[i] = acc[idx[i]]; 
           acc[idx[i]] = swap;
         }      
       }
+      tm_zeros(P);
       for (i = 0; i < n; i++) {
         *tm_at(P, i, acc[i]) = 1;
       }

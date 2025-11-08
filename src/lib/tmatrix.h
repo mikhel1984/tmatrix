@@ -26,7 +26,7 @@
 #define NULL_TMATRIX {0,0,0,0,0}  /**< Empty matrix initialization. */
 #define TM_VERTICAL   1           /**< Vertical concatenation. */
 #define TM_HORIZONTAL 0           /**< Horizontal concatenation. */
-#define NULL_TQN {0, 0, 0, 0}
+#define NULL_TQN {0, 0, 0, 0}     /**< Empty quaternion initialization. */
 
 /** 
  * @brief Get empty matrix with dynamically allocated memory.

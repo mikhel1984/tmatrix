@@ -43,6 +43,7 @@ enum TM_ERR {
      TM_ERR_NO_SOLUTN,        /**< Solution cannot be found. */
      TM_ERR_NOT_HOMO,         /**< Not a homogeneous transform matrix. */
      TM_ERR_NOT_VEC,          /**< Not a vector. */
+     TM_ERR_NOT_POS_DEF,      /**< Matrix is not positive definite. */
      TM_ERR_TOTAL             /**< Number of errors in list. */   
 };
 
