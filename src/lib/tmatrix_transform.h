@@ -44,6 +44,15 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err);
  */
 void tf_lu(tMat* L, tMat* U, tMat* m, int* err);
 
+/**
+ * @brief QR decomposition.
+ *
+ * Find such matrices Q, R for the given M that Q*R = M.
+ * @param Q found orthogonal matrix.
+ * @param R found upper triangular matrix.
+ * @param m source matrix.
+ * @param err error code.
+ */
 void tf_qr(tMat* Q, tMat* R, tMat* m, int* err);
 
 #endif 
