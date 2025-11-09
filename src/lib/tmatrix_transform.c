@@ -185,34 +185,76 @@ void householder(tMat* H, tMat* vec, int* err)
         *err = TM_ERR_NO_SOLUTN;
     } else 
       *err = TM_ERR_NOT_COMPAT;
-  } else {
+  } else
     *err = TM_ERR_NOT_VEC;
-  }
-
-end_householder:
 }
 
+int qrdcmp(tMat* Q, tMat* R)
+{
+  int i, j, k, sing=0;
+  int nr = R->rows, nc = R->cols;
+  tmVal scale, sigma, sum, tau, tmp, *ref;
+
+  for (k = 0; k < nc-1; k++) {
+    scale = 0;
+    for (i=k; i < nc; i++) {
+      tmp = fabs(*tm_at(R,i,k));
+      scale = (tmp > scale) ? tmp : scale;
+    }
+    if (scale == 0.0) {
+      sing = 1;
+    } else {
+      sum = 0;
+      for (i = k; i < nr; i++) {
+        ref = tm_at(R,i,k);
+        *ref /= scale;
+        sum += (*ref) * (*ref);
+      } 
+      sigma = sqrt(sum);
+      sigma = (*tm_at(R,k,k) >= 0) ? sigma : (-sigma);
+      ref = tm_at(R,k,k);
+      *ref += sigma;
+      tmp = sigma * (*ref);
+      for (j=k+1; j < nc; j++) {
+        sum = 0.0;
+        for (i = k; i < nr; i++) 
+          sum += (*tm_at(R,i,k)) * (*tm_at(R,i,j));
+        tau = sum/tmp;
+        for (i = k; i < nr; i++)
+          *tm_at(R,i,j) -= tau * (*tm_at(R,i,k));
+      }
+      for (j=0; j < nc; j++) {
+        sum = 0.0;
+        for (i = k; i < nr; i++) 
+          sum += (*tm_at(R,i,k)) * (*tm_at(Q,i,j));
+        tau = sum/tmp;
+        for (i = k; i < nr; i++)
+          *tm_at(Q,i,j) -= tau * (*tm_at(R,i,k));
+      }
+
+      *tm_at(R,k,k) = -scale*sigma;
+    }
+  }
+  return sing;
+}
+
+// https://stackoverflow.com/questions/53489237/how-can-you-implement-householder-based-qr-decomposition-in-python
 void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
 {
-  int e = 0, i, j, tmin;
+  int e = 0, i, j;
   int nr = m->rows, nc = m->cols;
-  tMat vec;
   
   TM_ASSERT_ARGS(m && Q && R && IS_UNIQUE3(m,Q,R), e, end_qr);
 
   if (tm_relevant(Q,nr,nr,&e) && tm_relevant(R,nr,nc,&e)) {
-    tm_eye(Q);
-    tmin = (nr-1) < nc ? (nr-1) : nc;
-    for (i = 0; i < tmin; i++) {
-      vec = tm_block(m,i,i,tmin-i,1,&e);
-      if (e) goto end_qr;
-      /* use R to store householder matrix */
-      R->rows = R->cols = tmin-i;
-      householder(R, &vec, &e); 
-      if (e) goto end_qr;
-
+    for (i = 0; i < nr; i++) {
+      for (j = 0; j < nc; j++)
+        *tm_at(R,i,j) = *tm_at(m,i,j);
     }
-    
+    tm_eye(Q);
+
+    qrdcmp(Q, R);
+   
   }
 
 end_qr:

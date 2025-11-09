@@ -44,4 +44,6 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err);
  */
 void tf_lu(tMat* L, tMat* U, tMat* m, int* err);
 
+void tf_qr(tMat* Q, tMat* R, tMat* m, int* err);
+
 #endif 
