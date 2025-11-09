@@ -189,13 +189,14 @@ void householder(tMat* H, tMat* vec, int* err)
     *err = TM_ERR_NOT_VEC;
 }
 
-int qrdcmp(tMat* Q, tMat* R)
+int qrdcmp(tMat* Qt, tMat* R)
 {
   int i, j, k, sing=0;
-  int nr = R->rows, nc = R->cols;
+  int nr = R->rows, nc = R->cols, ntot;
   tmVal scale, sigma, sum, tau, tmp, *ref;
+  ntot = ((nr-1) < nc) ? (nr-1) : nc;
 
-  for (k = 0; k < nc-1; k++) {
+  for (k = 0; k < ntot; k++) {
     scale = 0;
     for (i=k; i < nc; i++) {
       tmp = fabs(*tm_at(R,i,k));
@@ -215,6 +216,7 @@ int qrdcmp(tMat* Q, tMat* R)
       ref = tm_at(R,k,k);
       *ref += sigma;
       tmp = sigma * (*ref);
+      /* update R */
       for (j=k+1; j < nc; j++) {
         sum = 0.0;
         for (i = k; i < nr; i++) 
@@ -223,13 +225,14 @@ int qrdcmp(tMat* Q, tMat* R)
         for (i = k; i < nr; i++)
           *tm_at(R,i,j) -= tau * (*tm_at(R,i,k));
       }
-      for (j=0; j < nc; j++) {
+      /* update Q */
+      for (j=0; j < nr; j++) {
         sum = 0.0;
         for (i = k; i < nr; i++) 
-          sum += (*tm_at(R,i,k)) * (*tm_at(Q,i,j));
+          sum += (*tm_at(R,i,k)) * (*tm_at(Qt,i,j));
         tau = sum/tmp;
         for (i = k; i < nr; i++)
-          *tm_at(Q,i,j) -= tau * (*tm_at(R,i,k));
+          *tm_at(Qt,i,j) -= tau * (*tm_at(R,i,k));
       }
 
       *tm_at(R,k,k) = -scale*sigma;
@@ -238,11 +241,13 @@ int qrdcmp(tMat* Q, tMat* R)
   return sing;
 }
 
+#include <stdio.h>
 // https://stackoverflow.com/questions/53489237/how-can-you-implement-householder-based-qr-decomposition-in-python
 void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
 {
   int e = 0, i, j;
   int nr = m->rows, nc = m->cols;
+  tmVal tmp;
   
   TM_ASSERT_ARGS(m && Q && R && IS_UNIQUE3(m,Q,R), e, end_qr);
 
@@ -254,7 +259,19 @@ void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
     tm_eye(Q);
 
     qrdcmp(Q, R);
-   
+    /* transpose Q */
+    for (i = 0; i < nr; i++) {
+      for (j = i+1; j < nr; j++) {
+        tmp = *tm_at(Q,i,j);
+        *tm_at(Q,i,j) = *tm_at(Q,j,i);
+        *tm_at(Q,j,i) = tmp;
+      }
+    }
+    /* clear R */
+    for (j = 0; j < nc; j++) {
+      for (i = j+1; i < nr; i++) 
+        *tm_at(R,i,j) = 0;
+    }
   }
 
 end_qr:
