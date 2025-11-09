@@ -47,7 +47,6 @@ int main()
   qvel = vec_static(JOINT_NO,q,&err);
   if(err) printf("ERROR: %s\n", tm_error(err));
   
-  cvel = tm_simp();  /* prepare matrix */
   if(!tm_mul(&cvel,&jac,&qvel,&err)) printf("ERROR: %s\n", tm_error(err));
   /* transpose for visualization */
   ct = tm_T(&cvel,&err); 

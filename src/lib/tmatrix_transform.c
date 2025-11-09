@@ -157,3 +157,64 @@ end_lu:
   if (err) *err = e;
 }
 
+void householder(tMat* H, tMat* vec, int* err)
+{
+  int n, i, j; 
+  tmVal s = 0, tmp, rowi;
+
+  /* expected column-vector */
+  if (vec->cols == 1) {
+    n = vec->rows;
+    if (H->cols == n && H->rows == n) {
+      for (i = 0; i < n; i++) {
+        tmp = *tm_at(vec,i,0);
+        s += tmp*tmp;
+      }
+      if (s > 0) {
+        s = 2.0 / s;
+        for (i = 0; i < n; i++) {
+          rowi = *tm_at(vec,i,0) * s;
+          for (j = i; j < n; j++) {
+            tmp = (i == j) ? 1 : 0;
+            tmp -= rowi * (*tm_at(vec,j,0));
+            *tm_at(H,i,j) = tmp;
+            *tm_at(H,j,i) = tmp;
+          }
+        }
+      } else 
+        *err = TM_ERR_NO_SOLUTN;
+    } else 
+      *err = TM_ERR_NOT_COMPAT;
+  } else {
+    *err = TM_ERR_NOT_VEC;
+  }
+
+end_householder:
+}
+
+void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
+{
+  int e = 0, i, j, tmin;
+  int nr = m->rows, nc = m->cols;
+  tMat vec;
+  
+  TM_ASSERT_ARGS(m && Q && R && IS_UNIQUE3(m,Q,R), e, end_qr);
+
+  if (tm_relevant(Q,nr,nr,&e) && tm_relevant(R,nr,nc,&e)) {
+    tm_eye(Q);
+    tmin = (nr-1) < nc ? (nr-1) : nc;
+    for (i = 0; i < tmin; i++) {
+      vec = tm_block(m,i,i,tmin-i,1,&e);
+      if (e) goto end_qr;
+      /* use R to store householder matrix */
+      R->rows = R->cols = tmin-i;
+      householder(R, &vec, &e); 
+      if (e) goto end_qr;
+
+    }
+    
+  }
+
+end_qr:
+  if (err) *err = e;
+}

@@ -26,10 +26,12 @@
 #define NULL_TMATRIX {0,0,0,0,0}  /**< Empty matrix initialization. */
 #define TM_VERTICAL   1           /**< Vertical concatenation. */
 #define TM_HORIZONTAL 0           /**< Horizontal concatenation. */
-#define NULL_TQN {0, 0, 0, 0}     /**< Empty quaternion initialization. */
+#define UNIT_QTN {1, 0, 0, 0}     /**< Unit quaternion initialization. */
+#define NULL_TQN {0, 0, 0, 0}     /**< deprecated!!! */
 
 /** 
  * @brief Get empty matrix with dynamically allocated memory.
+ * Deprecated!!!
  */
 #define tm_simp()          tm_new(0,0,0)
 

@@ -298,7 +298,7 @@ static char* test_inv()
 {
   int err = 0,i,j;
   tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d, cond;
-  tMat m, im, pr; 
+  tMat m, im, pr = NULL_TMATRIX; 
    
   m = tm_static(3,3,a1,&err);
   mu_check("Inv (static):", err);
@@ -314,7 +314,6 @@ static char* test_inv()
   
   mu_assert("Inv (cond): wrong condition number", EQL(cond, tm_cond(&m, &err)));
   mu_check("Inv (cond):", err);
-  pr = tm_simp();
   
   tm_mul(&pr,&m,&im,&err); 
   mu_check("Inv (mul):", err);
@@ -345,7 +344,7 @@ static char* test_pinv()
 {
   int err = 0,i,j;
   tmVal a1[8] = {1,3,4,5,7,2,8,6},v;
-  tMat m, im, pr; 
+  tMat m, im, pr = NULL_TMATRIX; 
    
   m = tm_static(2,4,a1,&err);
   mu_check("Pinv (static):", err);
@@ -353,8 +352,7 @@ static char* test_pinv()
   im = tm_new(0,0, &err);
   tm_pinv(&im, &m, &err);
   mu_check("Pinv (pinv):", err);
-   
-  pr = tm_simp();     
+  
   tm_mul(&pr,&m,&im,&err);
   mu_check("Pinv (mul):", err);   
   for(i = 0; i < 2; i++) {
@@ -448,7 +446,7 @@ static char* test_vec()
 {
   int err = 0,i;
   tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d, a2[] = {-10,6,-2};
-  tMat v1, v2, pr; 
+  tMat v1, v2, pr = NULL_TMATRIX; 
   
   v1 = vec_static(3,a1,&err);
   mu_check("Vec (static):", err);
@@ -467,8 +465,7 @@ static char* test_vec()
   d = vec_dot(&v1,&v2,&err);
   mu_check("Vec (dot):", err);
   mu_assert("Vec (dot): wrong result", EQL(d,48));
-  
-  pr = tm_simp();
+
   vec_cross(&pr,&v1,&v2,&err);
   mu_check("Vec (cross):", err);
   
@@ -543,19 +540,19 @@ static char* test_make()
     }
   }
   
-  c1 = tm_concat(m,2,TM_VERTICAL,&err);
+  c2 = tm_concat(m,2,TM_VERTICAL,&err);
   mu_check("Make (concat v):", err);
   
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       e1 = tm_get(m,i,j,&err);
       mu_check("Make (get):", err);
-      e2 = tm_get(&c1,i,j,&err);
+      e2 = tm_get(&c2,i,j,&err);
       mu_check("Make (get):", err);
       mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
       e1 = tm_get(m+1,i,j,&err);
       mu_check("Make (get):", err);
-      e2 = tm_get(&c1,i+2,j,&err);
+      e2 = tm_get(&c2,i+2,j,&err);
       mu_check("Make (get):", err);
       mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
     }
@@ -627,7 +624,7 @@ static char* test_rotation()
   tmVal roll = 0.1, pitch = -0.3, yaw = 0.5;
   tmVal arr[9] = {0}, angle, v1, v2, v3;
   tMat axis, m1, m2, m3;
-  tQn quat = NULL_TQN;
+  tQn quat = UNIT_QTN;
   
   m1 = tm_static(3,3,arr,&err);
   m2 = tm_new(3,3,&err);

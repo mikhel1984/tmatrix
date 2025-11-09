@@ -289,7 +289,7 @@ end_toaa:
 tQn qn_add(tQn* q1, tQn* q2, int* err)
 {
   int e = 0;
-  tQn sum = NULL_TQN;
+  tQn sum = UNIT_QTN;
 
   TM_ASSERT_ARGS(q1 && q2, e, end_qadd);
 
@@ -308,7 +308,7 @@ end_qadd:
 tQn qn_sub(tQn* q1, tQn* q2, int* err)
 {
   int e = 0;
-  tQn sum = NULL_TQN;
+  tQn sum = UNIT_QTN;
 
   TM_ASSERT_ARGS(q1 && q2, e, end_qsub);
 
@@ -327,7 +327,7 @@ end_qsub:
 tQn qn_mul(tQn* q1, tQn* q2, int* err)
 {
   int e = 0;
-  tQn res = NULL_TQN;
+  tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q1 && q2, e, end_qmul);
 
@@ -346,7 +346,7 @@ end_qmul:
 tQn qn_conj(tQn* q, int* err)
 {
   int e = 0;
-  tQn res = NULL_TQN;
+  tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q, e, end_conj); 
   
@@ -366,7 +366,7 @@ tQn qn_inv(tQn* q, int* err)
 {
   int e = 0;
   tmVal n;
-  tQn res = NULL_TQN;
+  tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q, e, end_qinv);
 
@@ -412,7 +412,7 @@ tmVal qn_abs(tQn* q)
 tQn qn_scale(tQn* q, tmVal k, int* err)
 {
   int e = 0; 
-  tQn res = NULL_TQN;
+  tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q, e, end_qscale);
 
@@ -432,7 +432,7 @@ tQn qn_slerp(tQn* q1, tQn* q2, tmVal t, int *err)
 {
   int e = 0;
   tmVal fTheta, theta, t1 = 0.5, t2 = 0.5;
-  tQn res = NULL_TQN;
+  tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q1 && q2, e, end_slerp);
   TM_ASSERT_INDEX(t >= 0 && t <= 1, e, end_slerp);

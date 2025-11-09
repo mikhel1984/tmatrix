@@ -483,7 +483,6 @@ int tm_pinv(tMat* dst, tMat *src, int *err)
   blk = tm_T(src,&e); 			if(e) goto end_pinv;
     
   /* find pseudo inverse*/
-  prod2 = tm_simp();
   if(transp) {
     /* blk*LL*M*M*Lt  */
     if(!(tm_mul(&prod2,&blk,&LL,&e)    && tm_mul(dst,&prod2,&M,&e) &&
