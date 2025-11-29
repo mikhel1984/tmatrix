@@ -9,7 +9,12 @@
 #include "tmatrix.h"
 #include "tmatrix_priv.h"
 
+#define tm_row_ptr_(M,n) (M->data + n*(M->width))
+
+#define tm_diag_ptr_(M,n) (tm_row_ptr_(M,n) + n)
+
 #define MEM_TMP_VEC 8
+
 
 /* Cholesky decomposition */
 void tf_chol(tMat* dst, tMat* m, int* err)
@@ -297,9 +302,9 @@ tmVal pythag(tmVal a, tmVal b)
 #include <stdio.h>
 void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
 {
-  int i, j, k, l, its, flag, nm, jj;
+  int i, j, k, l, its, nm, jj;
   tmVal g = 0, scale = 0, anorm = 0, s, c, f, h;
-  tmVal *rv1 = NULL, *ref = NULL, tmp, x, y, z, zprev;
+  tmVal *rv1 = NULL, *ref = NULL, *rref = NULL, tmp, x, y, z;
   int m = U->rows, n = U->cols;
 
   rv1 = (tmVal*) calloc(n, sizeof(tmVal));
@@ -322,72 +327,78 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
           *ref /= scale;
           s += (*ref) * (*ref);
         }
-        f = *tm_at(U,i,i);
+        ref = tm_at(U,i,i);
+        f = *ref;
         g = sqrt(s);
         if (f > 0) g = -g;
         h = f*g - s;
-        *tm_at(U,i,i) = f-g;
+        *ref = f-g;
         for (j = l; j < n; j++) {
           s = 0.0;
           for (k = i; k < m; k++) {
-            s += (*tm_at(U,k,i)) * (*tm_at(U,k,j));
+            ref = tm_row_ptr_(U,k);
+            s += ref[i] * ref[j]; 
           }
           f = s/h;
           for (k = i; k < m; k++) {
-            *tm_at(U,k,j) += f * (*tm_at(U,k,i));
+            ref = tm_row_ptr_(U,k);
+            ref[j] += f * ref[i];
           }
         }
         for (k = i; k < m; k++)
           *tm_at(U,k,i) *= scale;
       }
     }
-    *tm_at(W,i,i) = scale*g;
+    *tm_diag_ptr_(W,i) = scale*g;
     g = s = scale = 0.0;
     if (i < m && i != n-1) {
+      ref = tm_row_ptr_(U,i);
       for (k = l; k < n; k++) 
-        scale += fabs(*tm_at(U,i,k));
+        scale += fabs(ref[k]);
       if (scale > 0) {
         for (k = l; k < n; k++) {
-          ref = tm_at(U,i,k);
-          *ref /= scale;
-          s += (*ref) * (*ref);
+          //ref = tm_at(U,i,k);
+          ref[k] /= scale;
+          s += ref[k] * ref[k];
         }
-        ref = tm_at(U,i,l);
-        f = *ref;
+        f = ref[l];
         g = sqrt(s);
         if (f > 0) g = -g;
         h = f*g - s;
-        *ref = f-g;
+        ref[l] = f-g;
         for (k = l; k < n; k++) 
-          rv1[k] = *tm_at(U,i,k)/h;
+          rv1[k] = ref[k]/h;
         for (j = l; j < m; j++) {
+          rref = tm_row_ptr_(U,j);
           s = 0.0;
           for (k = l; k < n; k++) 
-            s += (*tm_at(U,j,k)) * (*tm_at(U,i,k));
+            s += rref[k] * ref[k]; 
           for (k = l; k < n; k++) 
-            *tm_at(U,j,k) += s*rv1[k];
+            rref[k] += s*rv1[k];
         }
         for (k = l; k < n; k++) 
-          *tm_at(U,i,k) *= scale;
+          ref[k] *= scale;
       }
     }
-    tmp = fabs(*tm_at(W,i,i)) + fabs(rv1[i]);
+    tmp = fabs(*tm_diag_ptr_(W,i)) + fabs(rv1[i]);
     anorm = (tmp > anorm) ? tmp : anorm;
   }
 
   /* accumulation of right-hand transformations */
   for (i = n-1; i >= 0; i--) {
     if (i < n-1) {
+      ref = tm_row_ptr_(U,i);
       if (g) {
-        for (j = l; j < n; j++) {
-          *tm_at(V,j,i) = (*tm_at(U,i,j)) / (*tm_at(U,i,l)) / g;
-        }
+        for (j = l; j < n; j++) 
+          *tm_at(V,j,i) = (ref[j] / ref[l]) / g;
         for (j = l; j < n; j++) {
           s = 0.0;
           for (k = l; k < n; k++) 
-            s += (*tm_at(U,i,k)) * (*tm_at(V,k,j));
-          for (k = l; k < n; k++) 
-            *tm_at(V,k,j) += s * (*tm_at(V,k,i));
+            s += ref[k] * (*tm_at(V,k,j));
+          for (k = l; k < n; k++) {
+            rref = tm_row_ptr_(V,k);
+            rref[j] += s * rref[i];
+          }
         }
       }
       for (j = l; j < n; j++) {
@@ -405,18 +416,23 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
   i -= 1;
   for (; i >= 0; i--) {
     l = i+1;
-    g = *tm_at(W,i,i);
+    g = *tm_diag_ptr_(W,i);
+    ref = tm_row_ptr_(U,i);
     for (j = l; j < n; j++) 
-      *tm_at(U,i,j) = 0.0;
+      ref[j] = 0.0;
     if (g) {
       g = 1.0/g;
       for (j = l; j < n; j++) {
         s = 0.0;
-        for (k = l; k < m; k++) 
-          s += (*tm_at(U,k,i)) * (*tm_at(U,k,j));
-        f = (s / *tm_at(U,i,i)) * g;
-        for (k = i; k < m; k++) 
-          *tm_at(U,k,j) += f * (*tm_at(U,k,i));
+        for (k = l; k < m; k++) {
+          rref = tm_row_ptr_(U,k);
+          s += rref[i] * rref[j];
+        }
+        f = (s / ref[i]) * g;
+        for (k = i; k < m; k++) {
+          rref = tm_row_ptr_(U,k);
+          rref[j] += f * rref[i];
+        }
       }
       for (j = i; j < m; j++) 
         *tm_at(U,j,i) *= g;
@@ -424,48 +440,47 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
       for (j = i; j < m; j++) 
         *tm_at(U,j,i) = 0.0;
     }
-    *tm_at(U,i,i) += 1;
+    ref[i] += 1;
   }
 
   /* diagonalization of the bidiagonal form */
   for (k = n-1; k >= 1; k--) {
     for (its = 1; its <= 30; its++) {
-      zprev = *tm_at(W,k,k);
-      flag = 1;
+      jj = 1;  /* temporary use as flag */
       for (l = k; l >= 1; l--) {
         nm = l-1;
         if ((fabs(rv1[l]) + anorm) == anorm) {
-          flag = 0;
+          jj = 0;
           break;
         }
-        if ((fabs(*tm_at(W,nm,nm)) + anorm) == anorm) 
+        if ((fabs(*tm_diag_ptr_(W,nm)) + anorm) == anorm) 
           break;
       }
-      if (flag) {
+      if (jj) {
         c = 0.0; s = 1.0;
         for (i = l; i <= k; i++) {
           f = s*rv1[i];
           rv1[i] *= c;
           if ((fabs(f) + anorm) == anorm) 
             break;
-          g = *tm_at(W,i,i);
+          g = *tm_diag_ptr_(W,i);
           h = pythag(f, g);
-          *tm_at(W,i,i) = h;
+          *tm_diag_ptr_(W,i) = h;
           h = 1.0/h;
           c = g*h; s = -f*h;
           for (j = 0; j < m; j++) {
-            y = *tm_at(U,j,nm);
-            z = *tm_at(U,j,i);
-            *tm_at(U,j,nm) = y*c + z*s;
-            *tm_at(U,j,i)  =-y*s + z*c;
+            ref = tm_row_ptr_(U,j);
+            y = ref[nm];
+            z = ref[i]; 
+            ref[nm] = y*c + z*s;
+            ref[i]  =-y*s + z*c;
           }
         }
       }
-      z = *tm_at(W,k,k);
-      //if (its > 10 && fabs(z-zprev) < 1E-16) {
+      z = *tm_diag_ptr_(W,k);
       if (l == k) {
         if (z < 0.0) {
-          *tm_at(W,k,k) = -z;
+          *tm_diag_ptr_(W,k) = -z;
           for (j = 0; j < n; j++) 
             *tm_at(V,j,k) *= -1;
         }
@@ -476,9 +491,9 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         /* error */
         return;
       }  
-      x = *tm_at(W,l,l);
+      x = *tm_diag_ptr_(W,l);
       nm = k-1;
-      y = *tm_at(W,nm,nm);
+      y = *tm_diag_ptr_(W,nm);
       g = rv1[nm];
       h = rv1[k];
       f = ((y-z)*(y+z) + (g-h)*(g+h)) / (2*h*y);
@@ -490,7 +505,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
       for (j = l; j <= nm; j++) {
         i = j+1;
         g = rv1[i];
-        y = *tm_at(W,i,i);
+        y = *tm_diag_ptr_(W,i);
         h = s*g;
         g = c*g;
         z = pythag(f, h);
@@ -501,13 +516,14 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         h = y*s;
         y *= c;
         for (jj = 0; jj < n; jj++) {
-          x = *tm_at(V,jj,j);
-          z = *tm_at(V,jj,i);
-          *tm_at(V,jj,j) = x*c + z*s;
-          *tm_at(V,jj,i) =-x*s + z*c;
+          ref = tm_row_ptr_(V,jj);
+          x = ref[j];
+          z = ref[i];
+          ref[j] = x*c + z*s;
+          ref[i] =-x*s + z*c;
         }
         z = pythag(f, h);
-        *tm_at(W,j,j) = z;
+        *tm_diag_ptr_(W,j) = z;
         if (z > 0) {
           z = 1.0/z;
           c = f*z; s = h*z;
@@ -515,16 +531,17 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         f = c*g + s*y;
         x =-s*g + c*y;
         for (jj = 0; jj < m; jj++) {
-          y = *tm_at(U,jj,j);
-          z = *tm_at(U,jj,i);
-          *tm_at(U,jj,j) = y*c + z*s;
-          *tm_at(U,jj,i) =-y*s + z*c;
+          ref = tm_row_ptr_(U,jj);
+          y = ref[j];
+          z = ref[i];
+          ref[j] = y*c + z*s;
+          ref[i] =-y*s + z*c;
         }
       }
 
       rv1[l] = 0.0;
       rv1[k] = f;
-      *tm_at(W,k,k) = x;
+      *tm_diag_ptr_(W,k) = x;
     }
   }
 
@@ -551,12 +568,9 @@ void tf_svd(tMat* U, tMat* S, tMat* V, tMat* m, int* err)
         row_i[j] = *tm_at(m,i,j);
     }
     tm_zeros(S);
-    //tm_zeros(V);
     /* find SVD */
     svdcmp(U, V, S, &e);
-      
   }
-
 
 end_svd:
   if (err) *err = e;
