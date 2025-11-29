@@ -55,6 +55,19 @@ void tf_lu(tMat* L, tMat* U, tMat* m, int* err);
  */
 void tf_qr(tMat* Q, tMat* R, tMat* m, int* err);
 
+/**
+ * @brief SVD decomposition.
+ *
+ * Find such matrices U, S, W for the given matrix M that U*S*V^T = M.
+ * Notes: 
+ * - U has the same shape as M
+ * - singular values are not sorted
+ * @param U column-orthogonal matrix.
+ * @param S diagonal matrix with singular values.
+ * @param V transpose of orthogonal matrix.
+ * @param m source matrix.
+ * @param err error code.
+ */
 void tf_svd(tMat* U, tMat* S, tMat* V, tMat* m, int* err);
 
 #endif 

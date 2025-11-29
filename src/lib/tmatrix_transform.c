@@ -30,7 +30,7 @@ void tf_chol(tMat* dst, tMat* m, int* err)
       if (!IS_PRIM(dst)) {
         e = TM_ERR_NOT_MAIN;
         goto end_chol;
-      } 
+      }
       /* clear */
       tm_zeros(dst);
       /* find lower left part */
@@ -39,7 +39,7 @@ void tf_chol(tMat* dst, tMat* m, int* err)
         for (j = 0; j <= i; j++) {
           row_j = dst->data + j*n;
           s = *tm_at(m, i, j);
-          for (k = 0; k < j; k++) 
+          for (k = 0; k < j; k++)
             s -= row_i[k] * row_j[k];
           if (j < i) {
             row_i[j] = s / row_j[j];
@@ -53,9 +53,9 @@ void tf_chol(tMat* dst, tMat* m, int* err)
         }
       }
     }
-  } else 
+  } else
     e = TM_ERR_NOT_DEF;
-  
+
 end_chol:
   if(err) *err = e;
 }
@@ -75,7 +75,7 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
       if (!IS_PRIM(L) || !IS_PRIM(U) || !IS_PRIM(P)) {
         e = TM_ERR_NOT_MAIN;
         goto end_lup;
-      } 
+      }
       /* allocate memory */
       idx = (2*n <= MEM_TMP_VEC) ? arr : (int*) malloc(2*n * sizeof(int));
       if (!idx) {
@@ -91,7 +91,7 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
           row[j] = *tm_at(m, i, j);
       }
       /* find decomposition */
-      ludcmp(U,idx,&tmp,&e); 
+      ludcmp(U,idx,&tmp,&e);
       if (e) goto end_lup;
       for (i = 0; i < n; i++) {
         /* fill L and U */
@@ -109,9 +109,9 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
         /* row permutations */
         if (idx[i] != i) {
           swap = acc[i];
-          acc[i] = acc[idx[i]]; 
+          acc[i] = acc[idx[i]];
           acc[idx[i]] = swap;
-        }      
+        }
       }
       tm_zeros(P);
       for (i = 0; i < n; i++) {
@@ -123,7 +123,7 @@ void tf_lup(tMat* L, tMat* U, tMat* P, tMat* m, int* err)
 
 end_lup:
   if (err) *err = e;
-  if (2*n > MEM_TMP_VEC) free(idx);  
+  if (2*n > MEM_TMP_VEC) free(idx);
 }
 
 /* LU decomposition */
@@ -143,14 +143,14 @@ void tf_lu(tMat* L, tMat* U, tMat* m, int* err)
       }
       /* prepare */
       tm_zeros(U);
-      tm_eye(L); 
+      tm_eye(L);
       /* fill */
       for (i = 0; i < n; i++) {
         L_i = L->data + i*n;
         /* U */
         for (j = i; j < n; j++) {
           s = *tm_at(m,i,j);
-          for (k = 0; k < i; k++) 
+          for (k = 0; k < i; k++)
             s -= L_i[k] * (*tm_at(U,k,j));
           *tm_at(U,i,j) = s;
         }
@@ -163,7 +163,7 @@ void tf_lu(tMat* L, tMat* U, tMat* m, int* err)
         for (j = i+1; j < n; j++) {
           s = *tm_at(m,j,i);
           L_i = L->data + j*n;
-          for (k = 0; k < i; k++) 
+          for (k = 0; k < i; k++)
              s -= L_i[k] * (*tm_at(U,k,i));
           *tm_at(L,j,i) = s/uii;
         }
@@ -205,7 +205,7 @@ int qrdcmp(tMat* Qt, tMat* R)
         j = (i-k)*nc;      // tm_at(R,i,k)
         ref[j] /= scale;
         sum += ref[j] * ref[j];
-      } 
+      }
       sigma = sqrt(sum);
       sigma = (*ref >= 0) ? sigma : (-sigma);
       *ref += sigma;
@@ -226,7 +226,7 @@ int qrdcmp(tMat* Qt, tMat* R)
       /* update Q */
       for (j=0; j < nr; j++) {
         sum = 0.0;
-        for (i = k; i < nr; i++) 
+        for (i = k; i < nr; i++)
           sum += (*tm_at(R,i,k)) * (*tm_at(Qt,i,j));
         tau = sum/tmp;
         for (i = k; i < nr; i++)
@@ -245,14 +245,14 @@ void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
   int e = 0, i, j;
   int nr = m->rows, nc = m->cols;
   tmVal tmp, *row_i, *ref;
-  
+
   TM_ASSERT_ARGS(m && Q && R && IS_UNIQUE3(m,Q,R), e, end_qr);
 
   if (tm_relevant(Q,nr,nr,&e) && tm_relevant(R,nr,nc,&e)) {
     if (!IS_PRIM(Q) || !IS_PRIM(R)) {
       e = TM_ERR_NOT_MAIN;
       goto end_qr;
-    } 
+    }
     /* copy source matrix */
     for (i = 0; i < nr; i++) {
       row_i = R->data + i*nc;
@@ -274,7 +274,7 @@ void tf_qr(tMat* Q, tMat* R, tMat* m, int* err)
     }
     /* clear R */
     for (j = 0; j < nc; j++) {
-      for (i = j+1; i < nr; i++) 
+      for (i = j+1; i < nr; i++)
         *tm_at(R,i,j) = 0;
     }
   }
@@ -283,6 +283,7 @@ end_qr:
   if (err) *err = e;
 }
 
+/* Find hypot. */
 tmVal pythag(tmVal a, tmVal b)
 {
   a = fabs(a);
@@ -299,7 +300,7 @@ tmVal pythag(tmVal a, tmVal b)
   }
 }
 
-#include <stdio.h>
+/* SVD solver */
 void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
 {
   int i, j, k, l, its, nm, jj;
@@ -337,7 +338,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
           s = 0.0;
           for (k = i; k < m; k++) {
             ref = tm_row_ptr_(U,k);
-            s += ref[i] * ref[j]; 
+            s += ref[i] * ref[j];
           }
           f = s/h;
           for (k = i; k < m; k++) {
@@ -353,7 +354,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
     g = s = scale = 0.0;
     if (i < m && i != n-1) {
       ref = tm_row_ptr_(U,i);
-      for (k = l; k < n; k++) 
+      for (k = l; k < n; k++)
         scale += fabs(ref[k]);
       if (scale > 0) {
         for (k = l; k < n; k++) {
@@ -366,17 +367,17 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         if (f > 0) g = -g;
         h = f*g - s;
         ref[l] = f-g;
-        for (k = l; k < n; k++) 
+        for (k = l; k < n; k++)
           rv1[k] = ref[k]/h;
         for (j = l; j < m; j++) {
           rref = tm_row_ptr_(U,j);
           s = 0.0;
-          for (k = l; k < n; k++) 
-            s += rref[k] * ref[k]; 
-          for (k = l; k < n; k++) 
+          for (k = l; k < n; k++)
+            s += rref[k] * ref[k];
+          for (k = l; k < n; k++)
             rref[k] += s*rv1[k];
         }
-        for (k = l; k < n; k++) 
+        for (k = l; k < n; k++)
           ref[k] *= scale;
       }
     }
@@ -389,11 +390,11 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
     if (i < n-1) {
       ref = tm_row_ptr_(U,i);
       if (g) {
-        for (j = l; j < n; j++) 
+        for (j = l; j < n; j++)
           *tm_at(V,j,i) = (ref[j] / ref[l]) / g;
         for (j = l; j < n; j++) {
           s = 0.0;
-          for (k = l; k < n; k++) 
+          for (k = l; k < n; k++)
             s += ref[k] * (*tm_at(V,k,j));
           for (k = l; k < n; k++) {
             rref = tm_row_ptr_(V,k);
@@ -418,7 +419,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
     l = i+1;
     g = *tm_diag_ptr_(W,i);
     ref = tm_row_ptr_(U,i);
-    for (j = l; j < n; j++) 
+    for (j = l; j < n; j++)
       ref[j] = 0.0;
     if (g) {
       g = 1.0/g;
@@ -434,10 +435,10 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
           rref[j] += f * rref[i];
         }
       }
-      for (j = i; j < m; j++) 
+      for (j = i; j < m; j++)
         *tm_at(U,j,i) *= g;
     } else {
-      for (j = i; j < m; j++) 
+      for (j = i; j < m; j++)
         *tm_at(U,j,i) = 0.0;
     }
     ref[i] += 1;
@@ -453,7 +454,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
           jj = 0;
           break;
         }
-        if ((fabs(*tm_diag_ptr_(W,nm)) + anorm) == anorm) 
+        if ((fabs(*tm_diag_ptr_(W,nm)) + anorm) == anorm)
           break;
       }
       if (jj) {
@@ -461,7 +462,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         for (i = l; i <= k; i++) {
           f = s*rv1[i];
           rv1[i] *= c;
-          if ((fabs(f) + anorm) == anorm) 
+          if ((fabs(f) + anorm) == anorm)
             break;
           g = *tm_diag_ptr_(W,i);
           h = pythag(f, g);
@@ -471,7 +472,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
           for (j = 0; j < m; j++) {
             ref = tm_row_ptr_(U,j);
             y = ref[nm];
-            z = ref[i]; 
+            z = ref[i];
             ref[nm] = y*c + z*s;
             ref[i]  =-y*s + z*c;
           }
@@ -481,7 +482,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
       if (l == k) {
         if (z < 0.0) {
           *tm_diag_ptr_(W,k) = -z;
-          for (j = 0; j < n; j++) 
+          for (j = 0; j < n; j++)
             *tm_at(V,j,k) *= -1;
         }
         break;
@@ -490,7 +491,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
         *e = TM_ERR_NO_SOLUTN;
         /* error */
         return;
-      }  
+      }
       x = *tm_diag_ptr_(W,l);
       nm = k-1;
       y = *tm_diag_ptr_(W,nm);
@@ -548,6 +549,7 @@ void svdcmp(tMat* U, tMat* V, tMat* W, int* e)
   free(rv1);
 }
 
+/* SVD decomposition */
 void tf_svd(tMat* U, tMat* S, tMat* V, tMat* m, int* err)
 {
   int e = 0, i, j;
@@ -563,7 +565,7 @@ void tf_svd(tMat* U, tMat* S, tMat* V, tMat* m, int* err)
     }
     /* copy source matrix */
     for (i = 0; i < nr; i++) {
-      row_i = U->data + i*nc;
+      row_i = tm_row_ptr_(U,i);
       for (j = 0; j < nc; j++)
         row_i[j] = *tm_at(m,i,j);
     }
