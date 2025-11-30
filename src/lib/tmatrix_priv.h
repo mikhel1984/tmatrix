@@ -7,8 +7,8 @@
 #ifndef T_MATRIX_PRIVATE_H
 #define T_MATRIX_PRIVATE_H
 
-/** 
- * @brief Matrix types. 
+/**
+ * @brief Matrix types.
  */
 #define TM_ALLOC     0   /**< Matrix contains pointer to dynamic memory. */
 #define TM_STATIC    1   /**< Matrix contains pointer to static memory. */
@@ -29,8 +29,8 @@
 #define IS_UNIQUE4(A,B,C,D) (A != B && A != C && A != D && B != C && B != D && C != D)
 
 
-/** 
- * @brief Error types. 
+/**
+ * @brief Error types.
  */
 enum TM_ERR {
      TM_ERR_WRONG_SIZE = 1,   /**< Wrong matrix size definition. */
@@ -44,7 +44,7 @@ enum TM_ERR {
      TM_ERR_NOT_HOMO,         /**< Not a homogeneous transform matrix. */
      TM_ERR_NOT_VEC,          /**< Not a vector. */
      TM_ERR_NOT_POS_DEF,      /**< Matrix is not positive definite. */
-     TM_ERR_TOTAL             /**< Number of errors in list. */   
+     TM_ERR_TOTAL             /**< Number of errors in list. */
 };
 
 /**

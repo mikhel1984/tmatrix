@@ -3,10 +3,10 @@
  * @author Stanislav Mikhel
  * @date 2020
  * @brief Definitions of the main structures and functions for matrices.
- * 
+ *
  * This library is written in pure C and focused on coordinate transformations
- * in robotics applications. The header contains main data types and functions 
- * for the matrix operations in general.  
+ * in robotics applications. The header contains main data types and functions
+ * for the matrix operations in general.
  */
 
 #ifndef T_MATRIX_H
@@ -20,7 +20,7 @@
 #define TM_CHECK_ARGS             /**< Check correctness of the function arguments */
 #define TM_CHECK_INDEX            /**< Check correctness of the indeces */
 
-/** 
+/**
  * @brief Constants.
  */
 #define NULL_TMATRIX {0,0,0,0,0}  /**< Empty matrix initialization. */
@@ -29,7 +29,7 @@
 #define UNIT_QTN {1, 0, 0, 0}     /**< Unit quaternion initialization. */
 #define NULL_TQN {0, 0, 0, 0}     /**< deprecated!!! */
 
-/** 
+/**
  * @brief Get empty matrix with dynamically allocated memory.
  * Deprecated!!!
  */
@@ -51,14 +51,14 @@
  */
 #define tm_row(mat,r,err)  tm_block(mat, r, 0, 1, (mat)->cols, err)
 
-/** 
+/**
  * @brief Internal data types.
  */
 typedef unsigned char tmSize;  /**< Number of rows/columns (assumed < 256).  */
 typedef double tmVal;          /**< Type of the matrix elements. */
 
-/** 
- * @brief Matrix object. 
+/**
+ * @brief Matrix object.
  *
  * Matrix could contain allocated memory or include pointer to another object
  * with definition of access rules (for transposed matrix of sub matrix).
@@ -81,19 +81,19 @@ typedef struct tQn_ {
    tmVal z;                    /**< Imaginary k value. */
 }  tQn;
 
-/** 
+/**
  * @brief Create matrix of given size.
  *
- * Allocate memory and initialize it with zeros. 
+ * Allocate memory and initialize it with zeros.
  * @param r number of rows.
  * @param c number of columns.
  * @param err error code.
- * @return New zero matrix. 
+ * @return New zero matrix.
  * @note Free memory with @a tm_clear.
  */
 tMat tm_new(tmSize r, tmSize c, int* err);
 
-/** 
+/**
  * @brief Create matrix from static array.
  *
  * Set pointer into a matrix structure without modifications.
@@ -101,12 +101,12 @@ tMat tm_new(tmSize r, tmSize c, int* err);
  * @param c number of columns.
  * @param dat data array.
  * @param err error code.
- * @return New matrix. 
+ * @return New matrix.
  * @note Be shure that the data array is more of equal to r * c.
  */
 tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
 
-/** 
+/**
  * @brief Create identity matrix.
  *
  * Initialize matrix with zeros and sets diagonal elements
@@ -115,13 +115,13 @@ tMat tm_static(tmSize r, tmSize c, tmVal dat[], int* err);
  */
 void tm_eye(tMat* m);
 
-/** 
+/**
  * @brief Clear allocated memory (if need).
  * @param m pointer to matrix.
  */
 void tm_clear(tMat* m);
 
-/** 
+/**
  * @brief Get matrix element.
  * @param m matrix object.
  * @param r row number.
@@ -131,7 +131,7 @@ void tm_clear(tMat* m);
  */
 tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err);
 
-/** 
+/**
  * @brief Set matrix element.
  * @param m matrix object.
  * @param r row number.
@@ -141,21 +141,21 @@ tmVal tm_get(tMat* m, tmSize r, tmSize c, int* err);
  */
 void tm_set(tMat* m, tmSize r, tmSize c, tmVal v, int* err);
 
-/** 
+/**
  * @brief Get number of rows.
  * @param m matrix object.
  * @return Number of rows.
  */
 tmSize tm_rows(tMat* m);
 
-/** 
+/**
  * @brief Get number of columns.
  * @param m matrix object.
  * @return Number of columns.
  */
 tmSize tm_cols(tMat* m);
 
-/** 
+/**
  * @brief Create deep copy of the matrix.
  * @param src source matrix.
  * @param err - error code.
@@ -164,19 +164,19 @@ tmSize tm_cols(tMat* m);
  */
 tMat tm_copy(tMat* src, int *err);
 
-/** 
+/**
  * @brief Create transposed copy of the matrix.
  *
  * Method doesn't allocate new memory, it is just a reference to the original matrix.
  * @param src source matrix.
  * @param err error code.
- * @return Transposed matrix. 
+ * @return Transposed matrix.
  */
 tMat tm_T(tMat* src, int *err);
 
-/** 
+/**
  * @brief Create sub matrix.
- * 
+ *
  * Method doesn't allocate new memory, is is just a reference to the original matrix.
  * @param src source matrix.
  * @param r0 begin row number.
@@ -188,21 +188,21 @@ tMat tm_T(tMat* src, int *err);
  */
 tMat tm_block(tMat* src, tmSize r0, tmSize c0, tmSize Nr, tmSize Nc, int *err);
 
-/** 
+/**
  * @brief Copy values from source to destination.
  *
  * Matrix size must be equal.
  * @param dst destination matrix.
  * @param src source matrix.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int tm_insert(tMat *dst, tMat *src, int* err);
 
 /**
  * @brief Make new matrix, based on list of source matrices and some rule.
- * 
- * Rule could be defined via function, which define element value for given index in final matrix. 
+ *
+ * Rule could be defined via function, which define element value for given index in final matrix.
  * @param src list of matrices.
  * @param N for example, number of matrices in list (usage depends on rule).
  * @param R final number of rows.
@@ -233,65 +233,65 @@ void tm_zeros(tMat* dst);
 
 /*============== Arithmetic methods etc. ==============*/
 
-/** 
+/**
  * @brief Add two matrices.
- * 
+ *
  * Save result to dst: <i> dst += m </i>.
  * @param dst matrix to change.
  * @param m second matrix.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int tm_add(tMat *dst, tMat* m, int* err);
 
-/** 
+/**
  * @brief Subtract two matrices.
- * 
+ *
  * Save result to dst: <i> dst -= m </i>.
  * @param dst matrix to change.
  * @param m second matrix.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int tm_sub(tMat *dst, tMat* m, int* err);
 
-/** 
+/**
  * @brief Multiply matrix to scalar value.
- * 
+ *
  * Save result to dst: <i> dst *= k </i>.
  * @param dst matrix to change.
  * @param k multiplier.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int tm_scale(tMat *dst, tmVal k, int* err);
 
-/** 
+/**
  * @brief Multiply matrices.
- * 
+ *
  * Save result to dst: <i> dst = a * b </i>.
  * Destination matrix must has equal size or be dynamic.
  * @param dst matrix for result.
  * @param a first matrix.
  * @param b second matrix.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int tm_mul(tMat* dst, tMat *a, tMat *b, int *err);
 
-/** 
+/**
  * @brief Find determinant.
- * 
+ *
  * Matrix must be square.
  * @param m matrix object.
  * @param err error code.
- * @return Determinant value. 
+ * @return Determinant value.
  */
 tmVal tm_det(tMat *m, int *err);
 
-/** 
+/**
  * @brief Find inverted matrix.
- * 
+ *
  * Source matrix must be equal.
  * @param dst matrix for result.
  * @param m matrix object.
@@ -300,9 +300,9 @@ tmVal tm_det(tMat *m, int *err);
  */
 tmVal tm_inv(tMat *dst, tMat *m, int *err);
 
-/** 
+/**
  * @brief Find pseudo-inverted matrix.
- * 
+ *
  * @param dst matrix for result.
  * @param m matrix object.
  * @param err error code.

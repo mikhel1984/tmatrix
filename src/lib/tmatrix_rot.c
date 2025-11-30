@@ -7,14 +7,14 @@
 #include "tmatrix_rot.h"
 #include "tmatrix_priv.h"
 #include "tmatrix_vec.h"
-//#define _USE_MATH_DEFINES 
+//#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define MAX_ERR 1E-6
 
 #define qn_dot_(a,b) (a->w*b->w + a->x*b->x + a->y*b->y + a->z*b->z)
 
-/* Find sign (-1/0/1) */ 
+/* Find sign (-1/0/1) */
 int sign_(tmVal v)
 {
   return (v > 0) ?  1:
@@ -27,26 +27,26 @@ int rot_inv(tMat* dst, tMat* m, int* err)
   int e = 0, i, j, k;
   TM_ASSERT_ARGS(dst && m, e, end_rinv);
   TM_ASSERT_INDEX(m->rows == 3 && m->cols == 3, e, end_rinv);
-  
+
   if(tm_relevant(dst, 3, 3, &e)) {
     /* copy transposed values */
     if(IS_PRIM(dst)) {
       k = 0;
       for(i = 0; i < 3; ++i) {
-        for(j = 0; j < 3; ++j) 
+        for(j = 0; j < 3; ++j)
           dst->data[k++] = *tm_at(m, j, i);
       }
     } else {
       for(i = 0; i < 3; ++i) {
-        for(j = 0; j < 3; ++j) 
+        for(j = 0; j < 3; ++j)
           *tm_at(dst,i,j) = *tm_at(m,j,i);
       }
     }
   }
-  
+
 end_rinv:
-  if(err) *err = e; 
-  
+  if(err) *err = e;
+
   return !e;
 }
 
@@ -59,8 +59,8 @@ int rot_rpy(tMat* m, tmVal roll, tmVal pitch, tmVal yaw, int *err)
   TM_ASSERT_ARGS(m, e, end_rpy);
 
   if(tm_relevant(m, 3, 3, &e)) {
-    sr = sin(roll);  cr = cos(roll); 
-    sp = sin(pitch); cp = cos(pitch); 
+    sr = sin(roll);  cr = cos(roll);
+    sp = sin(pitch); cp = cos(pitch);
     sy = sin(yaw);   cy = cos(yaw);
 
     if(IS_PRIM(m)) {
@@ -72,7 +72,7 @@ int rot_rpy(tMat* m, tmVal roll, tmVal pitch, tmVal yaw, int *err)
       *tm_at(m,1,0) = cp*sy; *tm_at(m,1,1) = sp*sr*sy+cr*cy; *tm_at(m,1,2) = sp*cr*sy-sr*cy;
       *tm_at(m,2,0) = -sp;   *tm_at(m,2,1) = cp*sr;          *tm_at(m,2,2) = cp*cr;
     }
-  } 
+  }
 
 end_rpy:
   if(err) *err = e;
@@ -132,18 +132,18 @@ int rot_qn(tMat* m, tQn* q, int* err)
   TM_ASSERT_ARGS(m && q, e, end_qn);
 
   if(tm_relevant(m, 3, 3, &e)) {
-    ww = q->w * q->w; 
-    xx = q->x * q->x; 
-    yy = q->y * q->y; 
+    ww = q->w * q->w;
+    xx = q->x * q->x;
+    yy = q->y * q->y;
     zz = q->z * q->z;
 
     /* unit quaternion is expected */
     if(fabs(ww + xx + yy + zz - 1) < MAX_ERR) {
-      xy = q->x * q->y; 
-      xz = q->x * q->z; 
-      xw = q->x * q->w; 
-      yz = q->y * q->z; 
-      yw = q->y * q->w; 
+      xy = q->x * q->y;
+      xz = q->x * q->z;
+      xw = q->x * q->w;
+      yz = q->y * q->z;
+      yw = q->y * q->w;
       zw = q->z * q->w;
 
       if(IS_PRIM(m)) {
@@ -220,7 +220,7 @@ int rot_torpy(tmVal* roll, tmVal* pitch, tmVal* yaw, tMat* r, int *err)
   TM_ASSERT_INDEX(r->rows == 3 && r->cols == 3, e, end_torpy);
 
   s = -(*tm_at(r,2,0));
-  if(fabs(s-1) > MAX_ERR && fabs(s+1) > MAX_ERR) {  
+  if(fabs(s-1) > MAX_ERR && fabs(s+1) > MAX_ERR) {
     /* s != 1 && s != -1 */
     *roll  = atan2(*tm_at(r,2,1), *tm_at(r,2,2));
     *pitch = asin(s);
@@ -348,13 +348,13 @@ tQn qn_conj(tQn* q, int* err)
   int e = 0;
   tQn res = UNIT_QTN;
 
-  TM_ASSERT_ARGS(q, e, end_conj); 
-  
+  TM_ASSERT_ARGS(q, e, end_conj);
+
   res.w = q->w;
   res.x = -q->x;
   res.y = -q->y;
   res.z = -q->z;
-    
+
 end_conj:
   if(err) *err = e;
 
@@ -411,7 +411,7 @@ tmVal qn_abs(tQn* q)
 /* Product with scalar */
 tQn qn_scale(tQn* q, tmVal k, int* err)
 {
-  int e = 0; 
+  int e = 0;
   tQn res = UNIT_QTN;
 
   TM_ASSERT_ARGS(q, e, end_qscale);

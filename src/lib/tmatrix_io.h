@@ -5,7 +5,7 @@
  * @brief Functions for data input and output.
  */
 #ifndef T_MATRIX_IO_H
-#define T_MATRIX_IO_H 
+#define T_MATRIX_IO_H
 
 #include "tmatrix.h"
 
@@ -13,9 +13,9 @@
 
 #define tm_from_csv(mat,fname)  tm_from_file(mat,fname,',')
 
-/** 
+/**
  * @brief Simple matrix visualization.
- * @param m matrix object. 
+ * @param m matrix object.
  */
 void tm_print(tMat *m);
 
@@ -36,7 +36,7 @@ const char* tm_error(int code);
 int tm_to_file(tMat* m, char* fname, char sep);
 
 /**
- * @brief Initialize matrix from file 
+ * @brief Initialize matrix from file
  * @param dst matrix object.
  * @param fname file name.
  * @param sep separator character.

@@ -37,25 +37,25 @@ static char* test_transform();
 /* ~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int main()
-{  
+{
   float t;
   clock_t beg = clock();
   char *result = all_tests();
   t = (clock()-beg) / ((float) CLOCKS_PER_SEC);
-  if (result) 
+  if (result)
     printf("ERROR %s\n", result);
-  else 
+  else
     puts("ALL TESTS PASSED");
-  
+
   printf("Tests No: %d\n", tests_run);
   printf("Duration: %f s\n", t);
 
   return result != 0;
 }
 
-/* ~~~~~~~~~~~~~~~~~~~ Tests ~~~~~~~~~~~~~~~~~~~~~~ */ 
+/* ~~~~~~~~~~~~~~~~~~~ Tests ~~~~~~~~~~~~~~~~~~~~~~ */
 
-static char* all_tests() 
+static char* all_tests()
 {
   mu_run(test_init);
   mu_run(test_transpose);
@@ -72,7 +72,7 @@ static char* all_tests()
   mu_run(test_quaternion);
   mu_run(test_rotation);
   mu_run(test_transform);
-  
+
   return 0;
 }
 
@@ -86,26 +86,26 @@ static char* test_init()
     6,7,0};
   tMat cp, m = tm_new(3,3,&err), m2;
   mu_check("Init (new):", err);
-   
+
   tm_set(&m, 1, 1, 2, &err);
   mu_check("Init (set):", err);
 
   v = tm_get(&m, 1, 1, &err);
   mu_check("Init (get):", err);
   mu_assert("Init (get): v != 2", EQL(v,2));
-   
+
   m2 = tm_static(3,3, arr, &err);
-  mu_check("Init (static):", err);   
+  mu_check("Init (static):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (static): copy error", EQL(arr[i],m2.data[i])); 
+    mu_assert("Init (static): copy error", EQL(arr[i],m2.data[i]));
   }
-   
+
   cp = tm_copy(&m2,&err);
   mu_check("Init (copy):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Init (copy): wrong result", EQL(cp.data[i],m2.data[i])); 
+    mu_assert("Init (copy): wrong result", EQL(cp.data[i],m2.data[i]));
   }
-  
+
   tm_set(&m, 0, 0, 1e-5, &err);
   tm_print(&m);
 
@@ -121,7 +121,7 @@ static char* test_init()
   return 0;
 }
 
-static char* test_transpose() 
+static char* test_transpose()
 {
   int err = 0, i,j;
   tmVal v;
@@ -132,7 +132,7 @@ static char* test_transpose()
 
   tMat t, cp, m = tm_static(3,3,arr,&err);
   mu_check("Transpose (static):", err);
-  
+
   t = tm_T(&m, &err);
   mu_check("Transpose (T):", err);
   for(i = 0; i < 3; i++) {
@@ -143,11 +143,11 @@ static char* test_transpose()
 
   v = tm_get(&t, 0, 1, &err);
   mu_check("Transpose (get):", err);
-  mu_assert("Transpose (get): m(x,y) != m'(y,x)", EQL(v,tm_get(&m,1,0,NULL)));   
+  mu_assert("Transpose (get): m(x,y) != m'(y,x)", EQL(v,tm_get(&m,1,0,NULL)));
 
   tm_set(&t, 2, 1, 10, &err);
   mu_check("Transpose (set):", err);
-  mu_assert("Transpose (set): m(x,y) != m'(y,x)", EQL(10,tm_get(&m,1,2,NULL)));  
+  mu_assert("Transpose (set): m(x,y) != m'(y,x)", EQL(10,tm_get(&m,1,2,NULL)));
 
   cp = tm_copy(&t,&err);
   mu_check("Transpose (copy):", err);
@@ -160,7 +160,7 @@ static char* test_transpose()
   tm_clear(&m);
   tm_clear(&t);
   tm_clear(&cp);
-  
+
   return 0;
 }
 
@@ -178,20 +178,20 @@ static char* test_submatrix()
 
   s = tm_block(&m, 1,1,2,2, &err);
   mu_check("Submatrix (block):", err);
-  
+
   v = tm_get(&s, 0, 1, &err);
-  mu_check("Submatrix (get):", err);  
+  mu_check("Submatrix (get):", err);
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       mu_assert("Submatrix (get): not equal", EQL(tm_get(&m,i+1,j+1,0), tm_get(&s,i,j,0)));
     }
   }
-   
+
   tm_set(&s, 1, 0, 10, &err);
-  mu_check("Submatrix (set):", err);  
-  v = tm_get(&s,1,0,0); 
+  mu_check("Submatrix (set):", err);
+  v = tm_get(&s,1,0,0);
   mu_assert("Submatrix (s): v != 10", EQL(v,10));
-  
+
   cp = tm_copy(&s,&err);
   mu_check("Submatrix (copy):", err);
   for(i = 0; i < 2; i++) {
@@ -199,12 +199,12 @@ static char* test_submatrix()
       mu_assert("Submatrix (copy): wrong result", EQL(tm_get(&cp,i,j,0), tm_get(&s,i,j,0)));
     }
   }
-  
+
 
   tm_clear(&m);
   tm_clear(&s);
   tm_clear(&cp);
-  
+
   return 0;
 }
 
@@ -217,7 +217,7 @@ static char* test_cols()
     6,7,0};
   tMat c1,c2,m = tm_static(3,3,arr,&err);
   mu_check("Cols (static):", err);
-  
+
   c1 = tm_col(&m,1,&err);
   mu_check("Cols (col):", err);
   //c2 = tm_col(&m,3,&err);
@@ -225,14 +225,14 @@ static char* test_cols()
   c2 = tm_col(&m,2,&err);
   mu_check("Cols (col):", err);
   mu_assert("Cols (get): not equal", EQL(tm_get(&c1,1,0,0), tm_get(&m,1,1,0)));
-  
+
   tm_insert(&c1,&c2,&err);
   mu_check("Cols (insert):", err);
   for(i = 0; i < 3; i++) {
-      mu_assert("Cols (insert): wrong result", EQL(tm_get(&m,i,1,0), tm_get(&m,i,2,0)));    
+      mu_assert("Cols (insert): wrong result", EQL(tm_get(&m,i,1,0), tm_get(&m,i,2,0)));
   }
-    
-  return 0;  
+
+  return 0;
 }
 
 static char* test_sum()
@@ -241,36 +241,36 @@ static char* test_sum()
   tmVal a1[9] = {1,2,3,4,5,6,7,8,9};
   tmVal a2[9] = {3,5,7,2,4,8,0,6,9};
   tMat m1, m2, m0;
-   
+
   m0 = tm_static(3,3,a1,&err);
   mu_check("Sum (static):", err);
   m1 = tm_copy(&m0,&err);
   mu_check("Sum (copy):", err);
   m2 = tm_static(3,3,a2,&err);
   mu_check("Sum (static):", err);
-   
+
   tm_add(&m1,&m2,&err);
   mu_check("Sum (add):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]+a2[i])); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]+a2[i]));
   }
-   
+
   tm_sub(&m1,&m2,&err);
   mu_check("Sum (sub):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i])); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]));
   }
-  
+
   tm_scale(&m1,2,&err);
   mu_check("Sum (scale):", err);
   for(i = 0; i < 9; i++) {
-    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]*2)); 
+    mu_assert("Sum (add): wrong sum", EQL(m1.data[i], a1[i]*2));
   }
-   
+
   tm_clear(&m1);
   tm_clear(&m2);
-   
-  return 0;   
+
+  return 0;
 }
 
 static char* test_prod()
@@ -280,45 +280,45 @@ static char* test_prod()
   tmVal a2[9];
   tmVal a3[9] = {14,32,50,32,77,122,50,122,194};
   tMat m1, m2, m3;
-   
+
   m1 = tm_static(3,3,a1,&err);
   mu_check("Prod (static):", err);
   m2 = tm_static(3,3,a2,&err);
   mu_check("Prod (static):", err);
   m3 = tm_T(&m1,&err);
   mu_check("Prod (transpose):", err);
-   
+
   tm_mul(&m2, &m1,&m3, &err);
   mu_check("Prod (mul):", err);
   for(i = 0; i < 9; i++) {
     mu_assert("Prod (mul): wrong product", EQL(m2.data[i], a3[i]));
   }
-    
-  return 0;     
+
+  return 0;
 }
 
 static char* test_inv()
 {
   int err = 0,i,j;
   tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d, cond;
-  tMat m, im, pr = NULL_TMATRIX; 
-   
+  tMat m, im, pr = NULL_TMATRIX;
+
   m = tm_static(3,3,a1,&err);
   mu_check("Inv (static):", err);
-   
+
   d = tm_det(&m, &err);
   mu_check("Inv (det):", err);
   mu_assert("Inv (det): wrong value", EQL(d,-76));
-   
+
   im = tm_new(0,0,&err);
   cond = tm_inv(&im, &m, &err);
   mu_check("Inv (det):", err);
   mu_assert("Inv (inv): bad condition number", cond > 0 && cond < 1E14);
-  
+
   mu_assert("Inv (cond): wrong condition number", EQL(cond, tm_cond(&m, &err)));
   mu_check("Inv (cond):", err);
-  
-  tm_mul(&pr,&m,&im,&err); 
+
+  tm_mul(&pr,&m,&im,&err);
   mu_check("Inv (mul):", err);
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
@@ -326,8 +326,8 @@ static char* test_inv()
       mu_assert("Inv (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),d));
     }
   }
-  
-  tm_mul(&pr,&im,&m,&err); 
+
+  tm_mul(&pr,&im,&m,&err);
   mu_check("Inv (mul):", err);
   for(i = 0; i < 3; i++) {
     for(j = 0; j < 3; j++) {
@@ -335,11 +335,11 @@ static char* test_inv()
       mu_assert("Inv (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),d));
     }
   }
-  
-  tm_clear(&pr);   
+
+  tm_clear(&pr);
   tm_clear(&m);
   tm_clear(&im);
-   
+
   return 0;
 }
 
@@ -347,40 +347,40 @@ static char* test_pinv()
 {
   int err = 0,i,j;
   tmVal a1[8] = {1,3,4,5,7,2,8,6},v;
-  tMat m, im, pr = NULL_TMATRIX; 
-   
+  tMat m, im, pr = NULL_TMATRIX;
+
   m = tm_static(2,4,a1,&err);
   mu_check("Pinv (static):", err);
-   
+
   im = tm_new(0,0, &err);
   tm_pinv(&im, &m, &err);
   mu_check("Pinv (pinv):", err);
-  
+
   tm_mul(&pr,&m,&im,&err);
-  mu_check("Pinv (mul):", err);   
+  mu_check("Pinv (mul):", err);
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       v = (i == j) ? 1 : 0;
       mu_assert("Pinv (pinv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
   }
-  
+
   m = tm_static(4,2,a1,NULL);
   tm_pinv(&im, &m,&err);
   mu_check("Pinv (pinv):", err);
   tm_mul(&pr,&im,&m,&err);
-  mu_check("Pinv (mul):", err);   
+  mu_check("Pinv (mul):", err);
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       v = (i == j) ? 1 : 0;
       mu_assert("Pinv (pinv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
-  }   
-   
+  }
+
   tm_clear(&pr);
   tm_clear(&m);
   tm_clear(&im);
-   
+
   return 0;
 }
 
@@ -389,59 +389,59 @@ static char* test_homo()
   int err = 0, i, j;
   tmVal a1[TM_HOMO_SIZE], v;
   tMat m1, m2, cp, pr;
-     
+
   m1 = h_static(a1,&err);
-  mu_check("Homo (static):", err);   
+  mu_check("Homo (static):", err);
   h_Tx(&m1,10,&err);
-  mu_check("Homo (Tx):", err);  
-      
+  mu_check("Homo (Tx):", err);
+
   m2 = h_new(&err);
-  mu_check("Homo (new):", err);     
+  mu_check("Homo (new):", err);
   h_Ry(&m2,0.3,&err);
-  mu_check("Homo (Ry):", err);  
-   
+  mu_check("Homo (Ry):", err);
+
   cp = tm_copy(&m2,&err);
-  mu_check("Homo (copy):", err);  
-   
+  mu_check("Homo (copy):", err);
+
   h_inv(&m2,&err);
   mu_check("Homo (inv):", err);
   pr = h_new(&err);
-  mu_check("Homo (new):", err); 
+  mu_check("Homo (new):", err);
   tm_mul(&pr,&m2,&cp,&err);
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
       v = (i == j) ? 1 : 0;
-      mu_assert("Homo (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));       
+      mu_assert("Homo (inv): wrong matrix", EQL(tm_get(&pr,i,j,0),v));
     }
-  }   
+  }
   tm_clear(&cp);
-   
+
   cp = tm_copy(&m2,&err);
-  mu_check("Homo (copy):", err);  
-   
+  mu_check("Homo (copy):", err);
+
   h_T(&m2,&err);
-  mu_check("Homo (T):", err);  
+  mu_check("Homo (T):", err);
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
-      mu_assert("Homo (T): wrong matrix", EQL(tm_get(&m2,i,j,0),tm_get(&cp,j,i,0))); 
+      mu_assert("Homo (T): wrong matrix", EQL(tm_get(&m2,i,j,0),tm_get(&cp,j,i,0)));
     }
   }
-   
+
   tm_mul(&pr,&m1,&m2,&err);
-  mu_check("Homo (mul):", err);     
+  mu_check("Homo (mul):", err);
   h_mul(&m1,&m2,&err);
-  mu_check("Homo (mul):", err); 
+  mu_check("Homo (mul):", err);
   for(i = 0; i < 4; i++) {
     for(j = 0; j < 4; j++) {
-      mu_assert("Homo (mul): wrong matrix", EQL(tm_get(&m1,i,j,0),tm_get(&pr,i,j,0))); 
+      mu_assert("Homo (mul): wrong matrix", EQL(tm_get(&m1,i,j,0),tm_get(&pr,i,j,0)));
     }
   }
-     
+
   tm_clear(&pr);
   tm_clear(&cp);
   tm_clear(&m1);
   tm_clear(&m2);
-   
+
   return 0;
 }
 
@@ -449,39 +449,39 @@ static char* test_vec()
 {
   int err = 0,i;
   tmVal a1[9] = {1,3,4,5,7,2,8,6,1}, d, a2[] = {-10,6,-2};
-  tMat v1, v2, pr = NULL_TMATRIX; 
-  
+  tMat v1, v2, pr = NULL_TMATRIX;
+
   v1 = vec_static(3,a1,&err);
   mu_check("Vec (static):", err);
-  
+
   mu_assert("Vec (get): wrong value", EQL(vec_get(&v1,0,0),1));
-  
+
   d = vec_norm2(&v1,&err);
   mu_check("Vec (norm2):", err);
   mu_assert("Vec (norm2):", EQL(d, a1[0]*a1[0]+a1[1]*a1[1]+a1[2]*a1[2]));
-  
+
   v2 = tm_static(3,3,a1,&err);
   mu_check("Vec (static):", err);
   v2 = tm_col(&v2,1,&err);
   mu_check("Vec (col):", err);
-  
+
   d = vec_dot(&v1,&v2,&err);
   mu_check("Vec (dot):", err);
   mu_assert("Vec (dot): wrong result", EQL(d,48));
 
   vec_cross(&pr,&v1,&v2,&err);
   mu_check("Vec (cross):", err);
-  
+
   for(i = 0; i < 3; i++) {
     mu_assert("Vec (cross): wrong product", EQL(vec_get(&pr,i,0),a2[i]));
   }
-  
+
   vec_normalize(&v1,&err);
   mu_check("Vec (normalize):", err);
   mu_assert("Vec (normalize):", EQL(1.0, a1[0]*a1[0]+a1[1]*a1[1]+a1[2]*a1[2]));
-    
+
   tm_clear(&pr);
-  
+
   return 0;
 }
 
@@ -521,13 +521,13 @@ static char* test_make()
   tmVal e1,e2;
   tmVal a1[4] = {1,2,3,4}, a2[4] = {5,6,7,8};
   tMat m[2], c1,c2,c3;
-  
+
   m[0] = tm_static(2,2,a1,0);
   m[1] = tm_static(2,2,a2,0);
-  
+
   c1 = tm_concat(m,2,TM_HORIZONTAL,&err);
   mu_check("Make (concat h):", err);
-    
+
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       e1 = tm_get(m,i,j,&err);
@@ -542,10 +542,10 @@ static char* test_make()
       mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
     }
   }
-  
+
   c2 = tm_concat(m,2,TM_VERTICAL,&err);
   mu_check("Make (concat v):", err);
-  
+
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       e1 = tm_get(m,i,j,&err);
@@ -560,17 +560,17 @@ static char* test_make()
       mu_assert("Make (concat): wrong horizontal concatenation", EQL(e1,e2));
     }
   }
-  
+
   c3 = tm_make(m,0,m[0].rows-1,m[0].cols-1,minor00,&err);
   mu_check("Make (make):", err);
-  mu_assert("Make (make): wrong value", EQL(tm_get(m,1,1,0),tm_get(&c3,0,0,0)));   
-  
+  mu_assert("Make (make): wrong value", EQL(tm_get(m,1,1,0),tm_get(&c3,0,0,0)));
+
   tm_clear(&c1);
   tm_clear(&c2);
   tm_clear(&c3);
-  
+
   return 0;
-} 
+}
 
 static char *test_quaternion()
 {
@@ -578,7 +578,7 @@ static char *test_quaternion()
   tQn q1 = {0, 1, 2, 3};
   tQn q2 = {4, 5 ,6, 7};
   tQn qq, q3;
-  
+
   qn_print(&q1);
 
   qq = qn_add(&q1, &q2, &err);
@@ -596,22 +596,22 @@ static char *test_quaternion()
   mu_assert("Qn (norm): wrong value", EQL(1.0, qn_abs(&q3)));
 
   qq = qn_inv(&q2, &err);
-  mu_check("Qn (inv):", err);  
+  mu_check("Qn (inv):", err);
   qq = qn_mul(&qq, &q2, &err);
   mu_check("Qn (mul):", err);
   mu_assert("Qn (mul): wrong product", EQL(1.0, qq.w));
   mu_assert("Qn (mul): wrong product", EQL(0.0, qq.y));
-  
+
   qq = qn_scale(&q2, 1/qn_abs(&q2), &err);
   mu_check("Qn (scale):", err);
   mu_assert("Qn (scale): wrong scale", EQL(qq.x, q3.x));
   mu_assert("Qn (scale): wrong scale", EQL(qq.z, q3.z));
-  
+
   qq = qn_conj(&q1, &err);
   mu_check("Qn (conj):", err);
   mu_assert("Qn (conj): wrong value", EQL(qq.y, -q1.y));
   mu_assert("Qn (conj): wrong value", EQL(qq.w, q1.w));
-  
+
   qn_normalize(&q1);
   qq = qn_slerp(&q1, &q3, 1, &err);
   mu_check("Qn (slerp):", err);
@@ -628,15 +628,15 @@ static char* test_rotation()
   tmVal arr[9] = {0}, angle, v1, v2, v3;
   tMat axis, m1, m2, m3;
   tQn quat = UNIT_QTN;
-  
+
   m1 = tm_static(3,3,arr,&err);
   m2 = tm_new(3,3,&err);
-  
+
   rot_rpy(&m1, roll, pitch, yaw, &err);
   mu_check("Rot (rpy):", err);
   rot_inv(&m2, &m1, &err);
   mu_check("Rot (inv):", err);
-  
+
   m3 = tm_copy(&m2, &err);
   tm_mul(&m2, &m1, &m3, &err);
   mu_check("Rot (mul):", err);
@@ -645,11 +645,11 @@ static char* test_rotation()
       mu_assert("Rot (inv): wrong value", EQL(tm_get(&m2,i,j,0), (i==j ? 1.0 : 0.0)));
     }
   }
-  
+
   axis = vec_new(3, &err);
   rot_toaa(&axis, &angle, &m1, &err);
   mu_check("Rot (to aa):", err);
-  
+
   rot_aa(&m2, &axis, angle, &err);
   mu_check("Rot (aa):", err);
   for(i = 0; i < 3; ++i) {
@@ -657,10 +657,10 @@ static char* test_rotation()
       mu_assert("Rot (aa): wrong value", EQL(tm_get(&m1,i,j,0), tm_get(&m2,i,j,0)));
     }
   }
-  
+
   rot_toqn(&quat, &m2, &err);
   mu_check("Rot (toqn):", err);
-  
+
   tm_eye(&m2);
   rot_qn(&m2, &quat, &err);
   mu_check("Rot (qn):", err);
@@ -669,18 +669,18 @@ static char* test_rotation()
       mu_assert("Rot (qn): wrong value", EQL(tm_get(&m1,i,j,0), tm_get(&m2,i,j,0)));
     }
   }
-  
+
   rot_torpy(&v1, &v2, &v3, &m2, &err);
   mu_check("Rot (torpy):", err);
   mu_assert("Rot (torpy): wrong angle", EQL(v1,roll));
   mu_assert("Rot (torpy): wrong angle", EQL(v2,pitch));
   mu_assert("Rot (torpy): wrong angle", EQL(v3,yaw));
-  
+
   tm_clear(&axis);
   tm_clear(&m1);
   tm_clear(&m2);
   tm_clear(&m3);
-  
+
   return 0;
 }
 
@@ -705,6 +705,9 @@ static char* test_transform()
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+      if(j > i) {
+        mu_assert("Transforms (chol): not triangular", EQL(tm_get(&L,i,j,0), 0.0));
+      }
     }
   }
 
@@ -716,6 +719,11 @@ static char* test_transform()
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+      if(j > i) {
+        mu_assert("Transforms (LU): not triangular", EQL(tm_get(&L,i,j,0), 0.0));
+      } else if(j < i) {
+        mu_assert("Transforms (LU): not triangular", EQL(tm_get(&U,i,j,0), 0.0));
+      }
     }
   }
 
@@ -729,6 +737,11 @@ static char* test_transform()
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       mu_assert("Transforms (get): not equal", EQL(tm_get(&prod2,i,j,0), tm_get(&prod,i,j,0)));
+      if(j > i) {
+        mu_assert("Transforms (LUP): not triangular", EQL(tm_get(&L,i,j,0), 0.0));
+      } else if(j < i) {
+        mu_assert("Transforms (LUP): not triangular", EQL(tm_get(&U,i,j,0), 0.0));
+      }
     }
   }
 
@@ -737,9 +750,21 @@ static char* test_transform()
 
   tm_mul(&prod, &L, &U, &err);
   mu_check("Transforms (QR mul):", err);
+  Wt = tm_T(&L, &err);
+  mu_check("Transforms (QR transpose):", err);
+  tm_mul(&prod2, &L, &Wt, &err);
+  mu_check("Transforms (QR mul):", err);
   for(i = 0; i < 2; i++) {
     for(j = 0; j < 2; j++) {
       mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+      if(j < i) {
+        mu_assert("Transforms (QR): not triangular", EQL(tm_get(&U,i,j,0), 0.0));
+      }
+      if(i == j) {
+        mu_assert("Transforms (QR): not identity", EQL(tm_get(&prod2,i,j,0), 1.0));
+      } else {
+        mu_assert("Transforms (QR): not identity", EQL(tm_get(&prod2,i,j,0), 0.0));
+      }
     }
   }
 
@@ -756,6 +781,26 @@ static char* test_transform()
     for(j = 0; j < 2; j++) {
       mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod2,i,j,0)));
     }
+    if(i != j) {
+      mu_assert("Transforms (SVD): not diagonal", EQL(tm_get(&P,i,j,0), 0.0));
+    }
+  }
+  tm_mul(&prod, &L, &Wt, &err);
+  mu_check("Transforms (SVD mul):", err);
+  Wt = tm_T(&U, &err);
+  mu_check("Transforms (SVD transpose):", err);
+  tm_mul(&prod2, &U, &Wt, &err);
+  mu_check("Transforms (SVD mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      if (i == j) {
+        mu_assert("Transforms (SVD): not identity", EQL(tm_get(&prod,i,j,0), 1.0));
+        mu_assert("Transforms (SVD): not identity", EQL(tm_get(&prod2,i,j,0), 1.0));
+      } else {
+        mu_assert("Transforms (SVD): not identity", EQL(tm_get(&prod,i,j,0), 0.0));
+        mu_assert("Transforms (SVD): not identity", EQL(tm_get(&prod2,i,j,0), 0.0));
+      }
+    }
   }
 
   tm_clear(&m);
@@ -765,6 +810,6 @@ static char* test_transform()
   tm_clear(&Wt);
   tm_clear(&prod);
   tm_clear(&prod2);
-    
+
   return 0;
 }

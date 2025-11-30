@@ -66,7 +66,7 @@ tmVal vec_dot(tMat *a, tMat *b, int *err);
 
 /**
  * @brief Cross product of two vectors.
- * 
+ *
  * Save result to res. Vectors must be of the length 3.
  * @param res matrix for result (with length equal to 3 or dynamic memory).
  * @param a first vector.
@@ -88,7 +88,7 @@ tmVal vec_norm2(tMat *m, int *err);
 
 /**
  * @brief Normalize vector.
- * 
+ *
  * Obtaine unit vector if its norm is not 0.
  * @param m matrix object.
  * @param err error code.

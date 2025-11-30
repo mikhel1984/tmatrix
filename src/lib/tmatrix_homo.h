@@ -4,7 +4,7 @@
  * @date 2020
  * @brief Definition of methods for homogeneous transformations.
  *
- * Homogeneous transformations assumes manipulations with matrices 4x4. 
+ * Homogeneous transformations assumes manipulations with matrices 4x4.
  * Provides all basic matrix operations.
  */
 #ifndef T_MATRIX_HOMO_H
@@ -13,7 +13,7 @@
 #include "tmatrix.h"
 
 /**
- * @brief Homogeneous matrix size. 
+ * @brief Homogeneous matrix size.
  */
 #define TM_HOMO_SIZE 16
 
@@ -97,7 +97,7 @@ int h_Ry(tMat* dst, tmVal b, int *err);
  */
 int h_Rx(tMat* dst, tmVal v, int *err);
 
-/** 
+/**
  * @brief Find matrix for Denavit-Hartenberg parameters.
  * @param dst destination matrix.
  * @param a length of common normal.
@@ -109,20 +109,20 @@ int h_Rx(tMat* dst, tmVal v, int *err);
  */
 int h_DH(tMat* dst, tmVal a, tmVal alpha, tmVal d, tmVal theta, int *err);
 
-/** 
+/**
  * @brief Multiply matrices.
- * 
+ *
  * Save result to dst: <i> dst *= m </i>.
  * @param dst matrix for result.
  * @param m second matrix.
  * @param err error code.
- * @return 1 in case of success. 
+ * @return 1 in case of success.
  */
 int h_mul(tMat *dst, tMat *m, int* err);
 
-/** 
+/**
  * @brief Find inverted matrix.
- * 
+ *
  * Save result to dst.
  * @param dst source (and destination) matrix.
  * @param err error code.
@@ -130,9 +130,9 @@ int h_mul(tMat *dst, tMat *m, int* err);
  */
 int h_inv(tMat *dst, int *err);
 
-/** 
+/**
  * @brief Find transposed matrix.
- * 
+ *
  * Save result to dst.
  * @param dst source (and destination) matrix.
  * @param err error code.
@@ -140,13 +140,13 @@ int h_inv(tMat *dst, int *err);
  */
 int h_T(tMat *dst, int *err);
 
-/** 
+/**
  * @brief Initialize identity matrix.
- * 
+ *
  * @param dst source (and destination) matrix.
  * @param err error code.
  * @return 1 in case of success.
  */
 int h_eye(tMat *dst, int *err);
 
-#endif 
+#endif

@@ -3,7 +3,7 @@
  * @author Stanislav Mikhel
  * @date 2020
  * @brief Visualization for matrices and errors
- */ 
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "tmatrix_io.h"
@@ -16,8 +16,8 @@ void tm_print(tMat *m)
 {
   int i, j, R, C;
   if(!m) {
-    puts("No matrix!");  
-    return;    
+    puts("No matrix!");
+    return;
   }
   R = m->rows;
   C = m->cols;
@@ -39,7 +39,7 @@ void tm_print(tMat *m)
     break;
   case TM_SUB:
     puts("(submatrix)");
-    break;  
+    break;
   default:
     break;
   }
@@ -58,27 +58,28 @@ const char* tm_error(int code)
     "operation is not defined",
     "solution cannot be found",
     "homogeneous matrix is expected",
-    "vector is expected"
+    "vector is expected",
+    "not a positive definite matrix"
   };
-  
+
   if(code == 0)
     return "No errors";
   else if(code >= TM_ERR_TOTAL || code < 0)
     return "Unknown error code";
-    
+
   return list[--code];
 }
 
 /* Matrix to file in csv-like form.*/
 int tm_to_file(tMat* m, char* fname, char sep)
 {
-  int r, c, r1, c1; 
+  int r, c, r1, c1;
   FILE* pFile = 0;
 
-  if(!m || !fname) return 0; 
+  if(!m || !fname) return 0;
   if((pFile = fopen(fname, "w")) == 0) return 0;
 
-  r1 = m->rows-1; 
+  r1 = m->rows-1;
   c1 = m->cols-1;
   for(r = 0; r <= r1 ; r++) {
     for(c = 0; c <= c1 ; c++) {
@@ -103,12 +104,12 @@ int tm_from_file(tMat* dst, char* fname, char sep)
   if(!dst || !fname) return 0;
   if((pFile = fopen(fname,"r")) == 0) return 0;
 
-  // estimate matrix size 
+  // estimate matrix size
   while((c = fgetc(pFile)) != EOF) {
     if(c == sep) {
-      j++; 
+      j++;
     } else if(c == '\n') {
-      i++; j = 0; 
+      i++; j = 0;
     }
   }
 
@@ -118,8 +119,8 @@ int tm_from_file(tMat* dst, char* fname, char sep)
     return 0;
   }
 
-  rewind(pFile); 
-  i = 0; j = 0; 
+  rewind(pFile);
+  i = 0; j = 0;
   pb = buff;
   while((c = fgetc(pFile)) != EOF) {
     if(c == sep || c == '\n') {

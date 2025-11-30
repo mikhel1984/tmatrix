@@ -3,9 +3,9 @@
  * @author Stanislav Mikhel
  * @date 2022
  * @brief Operations with quaternions and rotation matrices.
- * 
- * Rotation matrices must be 3x3. Quaternions can have arbitrary 
- * elements, but in the case of rotation unit quaternion are 
+ *
+ * Rotation matrices must be 3x3. Quaternions can have arbitrary
+ * elements, but in the case of rotation unit quaternion are
  * required.
  */
 #ifndef T_MATRIX_ROT_H
@@ -18,7 +18,7 @@
 /**
  * @brief Get matrix from Euler angles.
  *
- * Rotate X(roll)-Y(pitch)-Z(yaw) in fixed frame or 
+ * Rotate X(roll)-Y(pitch)-Z(yaw) in fixed frame or
  * Z(yaw)-Y(pitch)-X(roll) in current frames.
  * @param m matrix to change.
  * @param roll x rotation angle.
@@ -54,7 +54,7 @@ int rot_aa(tMat* m, tMat* k, tmVal a, int* err);
 
 /**
  * @brief Get axin and angle from the matrix.
- * 
+ *
  * @param k axis vector to change.
  * @param a angle of rotation.
  * @param r rotation matrix.
@@ -125,7 +125,7 @@ tQn qn_sub(tQn* q1, tQn* q2, int* err);
  */
 tQn qn_mul(tQn* q1, tQn* q2, int* err);
 
-/** 
+/**
  * @brief Multiply quaternion with scalar value.
  *
  * @param q source quaternion.
@@ -137,7 +137,7 @@ tQn qn_scale(tQn* q, tmVal k, int* err);
 
 /**
  * @brief Get quaternion conjugate.
- * 
+ *
  * @param q source quaternion.
  * @param err error code.
  * @return conjugation.
@@ -165,7 +165,7 @@ int qn_normalize(tQn* q);
 
 /**
  * @brief Find absolute value.
- * 
+ *
  * @param q quaternion.
  * @return absolute value.
  */

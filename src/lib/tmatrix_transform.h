@@ -23,7 +23,7 @@ void tf_chol(tMat* dst, tMat* m, int* err);
 /**
  * @brief LU decomposition with permutations.
  *
- * Find such matrices L, U, P for the given matrix M that 
+ * Find such matrices L, U, P for the given matrix M that
  * L*U = P*M.
  * @param L lower left triangle matrix.
  * @param U upper right triangle matrix.
@@ -59,7 +59,7 @@ void tf_qr(tMat* Q, tMat* R, tMat* m, int* err);
  * @brief SVD decomposition.
  *
  * Find such matrices U, S, W for the given matrix M that U*S*V^T = M.
- * Notes: 
+ * Notes:
  * - U has the same shape as M
  * - singular values are not sorted
  * @param U column-orthogonal matrix.
@@ -70,4 +70,4 @@ void tf_qr(tMat* Q, tMat* R, tMat* m, int* err);
  */
 void tf_svd(tMat* U, tMat* S, tMat* V, tMat* m, int* err);
 
-#endif 
+#endif
