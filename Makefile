@@ -21,15 +21,10 @@ OBJL = \
 OBJM = src/example.o
 OBJT = src/tests/tests.o
 
-OBJQ = src/transform.o
-
 # main program
 all: $(TARGET)
 
 $(TARGET): $(OBJM) lib$(PROJECT).a
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
-
-transforms: $(OBJQ) lib$(PROJECT).a
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 test: $(TEST)
@@ -54,8 +49,6 @@ src/lib/tmatrix_rot.o: src/lib/tmatrix_rot.c
 src/lib/tmatrix_transform.o: src/lib/tmatrix_transform.c
 src/example.o: src/example.c
 src/tests/tests.o: src/tests/tests.c
-
-src/transform.o: src/transform.c
 
 clean:
 	$(RM) $(OBJL) $(OBJT) $(OBJM) lib$(PROJECT).a $(TEST) $(TARGET)
