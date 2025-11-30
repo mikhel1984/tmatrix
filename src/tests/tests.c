@@ -6,6 +6,7 @@
 #include "../lib/tmatrix_vec.h"
 #include "../lib/tmatrix_io.h"
 #include "../lib/tmatrix_rot.h"
+#include "../lib/tmatrix_transform.h"
 #include "minunit.h"
 
 #define EQL(X,Y) fabs((X)-(Y)) < 1E-6
@@ -31,6 +32,7 @@ static char* test_rank();
 static char* test_make();
 static char* test_quaternion();
 static char* test_rotation();
+static char* test_transform();
 
 /* ~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -69,6 +71,7 @@ static char* all_tests()
   mu_run(test_make);
   mu_run(test_quaternion);
   mu_run(test_rotation);
+  mu_run(test_transform);
   
   return 0;
 }
@@ -678,5 +681,90 @@ static char* test_rotation()
   tm_clear(&m2);
   tm_clear(&m3);
   
+  return 0;
+}
+
+static char* test_transform()
+{
+  int err = 0, i, j;
+  tmVal arr[9] = {
+    4, 12, -16,
+    12, 37, -43,
+    -16, -43, 98 };
+
+  tMat m = tm_static(3,3,arr,&err);
+  tMat L = NULL_TMATRIX, U = NULL_TMATRIX, P = NULL_TMATRIX;
+  tMat Wt = NULL_TMATRIX, prod = NULL_TMATRIX, prod2 = NULL_TMATRIX;
+
+  tf_chol(&L, &m, &err);
+  mu_check("Transforms (cholesky):", err);
+
+  Wt = tm_T(&L, &err);
+  tm_mul(&prod, &L, &Wt, &err);
+  mu_check("Transforms (chol mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+    }
+  }
+
+  tf_lu(&L, &U, &m, &err);
+  mu_check("Transforms (LU):", err);
+
+  tm_mul(&prod, &L, &U, &err);
+  mu_check("Transforms (LU mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+    }
+  }
+
+  tf_lup(&L, &U, &P, &m, &err);
+  mu_check("Transforms (LUP):", err);
+
+  tm_mul(&prod, &L, &U, &err);
+  mu_check("Transforms (LUP mul):", err);
+  tm_mul(&prod2, &P, &m, &err);
+  mu_check("Transforms (LUP mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      mu_assert("Transforms (get): not equal", EQL(tm_get(&prod2,i,j,0), tm_get(&prod,i,j,0)));
+    }
+  }
+
+  tf_qr(&L, &U, &m, &err);
+  mu_check("Transforms (QR):", err);
+
+  tm_mul(&prod, &L, &U, &err);
+  mu_check("Transforms (QR mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod,i,j,0)));
+    }
+  }
+
+  tf_svd(&U, &P, &L, &m, &err);
+  mu_check("Transforms (SVD):", err);
+
+  tm_mul(&prod, &U, &P, &err);
+  mu_check("Transforms (SVD mul):", err);
+  Wt = tm_T(&L, &err);
+  mu_check("Transforms (SVD transpose):", err);
+  tm_mul(&prod2, &prod, &Wt, &err);
+  mu_check("Transforms (SVD mul):", err);
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < 2; j++) {
+      mu_assert("Transforms (get): not equal", EQL(tm_get(&m,i,j,0), tm_get(&prod2,i,j,0)));
+    }
+  }
+
+  tm_clear(&m);
+  tm_clear(&L);
+  tm_clear(&U);
+  tm_clear(&P);
+  tm_clear(&Wt);
+  tm_clear(&prod);
+  tm_clear(&prod2);
+    
   return 0;
 }
